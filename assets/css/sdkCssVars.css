@@ -1,0 +1,21 @@
+/* CSS Variables used in SDK components */
+:root {
+  --app-white: rgb(246, 246, 246);
+  --app-white-check: rgb(243, 247, 249);
+  --app-whiter: rgb(233, 238, 241);
+  --app-disabled-white: rgb(179, 192, 202);
+  --app-base: rgb(221, 230, 237);
+  --app-dark: rgb(118, 141, 160);
+  --app-darker: rgb(51, 73, 90);
+  --app-darkest: rgb(4, 46, 71);
+
+  --app-success: rgb(229, 249, 231);
+  --app-success-dark: rgb(67, 191, 104);
+  --app-error: rgb(251, 232, 232);
+  --app-error-dark: rgb(253, 94, 88);
+
+  /* Some standard values for typography */
+  --font-weight-bold: 700;
+  --font-weight-semibold: 600;
+  --font-weight-normal: 400;
+}

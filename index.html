@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/sdkCssVars.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/sdkStyles.css">
+    <title>Pega - React SDK - Sample application</title>
+  <script src="app.bundle.js"></script></head>
+  <body>
+    <noscript>
+      <strong>The React SDK example does not work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+
+    <div id="outlet"></div>
+    <script>
+      (async () => {
+        await window.pega.initPega({
+          authConfig: {
+            jwtUri: "http://localhost:8081"
+          },
+          serverConfig: {
+            infinityRestServerUrl: "https://sscl-cst-dt3.pegacloud.net/prweb",
+            // infinityRestServerUrl: "https://labbconsulting02.pegalabs.io/prweb",
+            sdkContentServerUrl: "http://localhost:3502/constellation/"
+          }
+        }, document.getElementById('outlet'));
+        await window.pega.initMashup(document.getElementById('outlet'));
+        // await window.pega.startCase('LABB-DX-Work-Resignation', {});
+        // await window.pega.startCase('SSCL-Leaver-Work-Resignation', {});
+        await window.pega.continueCase('ASSIGN-WORKLIST SSCL-LEAVER-WORK R-24015!CREATEFORM_DEFAULT', 'SSCL-Leaver-Work-Resignation')
+      })();
+    </script>
+  </body>
+</html>
