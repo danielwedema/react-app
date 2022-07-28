@@ -212,10 +212,10 @@
 <!--endnoindex--> 
         
     <div id="content" class=" article__content  content grid__9 order__2">
-        
+<!--         
         <link rel="stylesheet" type="text/css" href="/assets/css/sdkCssVars.css">
-        <link rel="stylesheet" type="text/css" href="/assets/css/sdkStyles.css">
-        <div id="outlet" class="dashboard__panel-container"></div>
+        <link rel="stylesheet" type="text/css" href="/assets/css/sdkStyles.css"> -->
+        <div id="outlet"></div>
 
         <script>
             (async () => {
@@ -225,12 +225,14 @@
                 },
                 serverConfig: {
                   infinityRestServerUrl: "https://sscl-cst-dt3.pegacloud.net/prweb",
+                //   infinityRestServerUrl: "http://localhost:9905/prweb",
                   sdkContentServerUrl: "http://localhost:3502/constellation/"
                 }
-              }, document.getElementById('outlet'));
+              });
               await window.pega.initMashup(document.getElementById('outlet'));
-              // await window.pega.startCase('LABB-DX-Work-Resignation', {});
+            //   await window.pega.startCase('LABB-DX-Work-Resignation', {});
               await window.pega.startCase('SSCL-Leaver-Work-Resignation', {});
+              // await window.pega.continueCase('ASSIGN-WORKLIST SSCL-LEAVER-WORK R-24015!CREATEFORM_DEFAULT', 'SSCL-Leaver-Work-Resignation')
             })();
           </script>
         

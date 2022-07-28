@@ -1446,7 +1446,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function AssignmentCard(props) {
-    const { children, actionButtons, onButtonPress, getPConnect } = props;
+    const { children, actionButtons, onButtonPress } = props;
     const [arMainButtons, setArMainButtons] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
     const [arSecondaryButtons, setArSecondaryButtons] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
     (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
@@ -1458,34 +1458,6 @@ function AssignmentCard(props) {
     function buttonPress(sAction, sType) {
         onButtonPress(sAction, sType);
     }
-    const { CASE_INFO: CASE_INFO, APP: { APP: c }, TODO: g } = window.PCore.getConstants();
-    const caseInfoID = props.getPConnect().getValue(CASE_INFO.CASE_INFO_ID);
-    const context = props.getPConnect().getContextName();
-    const i = e => {
-        const t = e.getValue(CASE_INFO.CASE_INFO_ACTIONS), n = e.getValue(CASE_INFO.ACTIVE_ACTION_ID), s = t.find((e => e.ID === n));
-        return (null == s ? void 0 : s.name) || "";
-    };
-    const l = e => {
-        const t = e.getValue(CASE_INFO.CHILD_ASSIGNMENTS);
-        let n = [];
-        if (t && t.length > 0) {
-            t.forEach(item => {
-                const a = (item.assignments || []).map((e_ => (Object.assign(Object.assign({}, e_), { caseName: item.Name }))));
-                n = n.concat(a);
-            });
-        }
-        return n;
-    };
-    const ge = e => "perform" !== e.getValue("context_data.caseViewMode");
-    const E = (e => {
-        const t = e.getValue(CASE_INFO.CASE_INFO_ACTIONS), n = e.getValue(CASE_INFO.ASSIGNMENT_LABEL), s = e.getValue(CASE_INFO.D_CASE_ASSIGNMENTS_RESULTS) || [], o = l(e) || [];
-        let c = JSON.parse(JSON.stringify(o));
-        c = c.map((e => (e.isChild = !0, e)));
-        const r = [...s, ...c];
-        let u = JSON.parse(JSON.stringify(r));
-        return t && !ge(e) && (u = u.map((t => (t.name = i(e) || n, t)))), u;
-    })(props.getPConnect());
-    const datasource = { source: E };
     return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null,
         children,
         arMainButtons && arSecondaryButtons && react__WEBPACK_IMPORTED_MODULE_0__.createElement(_ActionButtons__WEBPACK_IMPORTED_MODULE_1__["default"], { arMainButtons: arMainButtons, arSecondaryButtons: arSecondaryButtons, onButtonPress: buttonPress })));
@@ -2797,6 +2769,15 @@ const ModalViewContainer = (props) => {
         }
         return true;
     }
+    function showModal(show) {
+        if (bShowModal === show) {
+            return;
+        }
+        if (show) {
+            window.PCore.getPubSubUtils().subscribeOnce(window.PCore.getConstants().PUB_SUB_EVENTS.EVENT_CANCEL, () => setShowModal(false), "showModal");
+        }
+        setShowModal(show);
+    }
     (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
         // Establish the necessary containers
         const containerMgr = pConn.getContainerManager();
@@ -2892,7 +2873,7 @@ const ModalViewContainer = (props) => {
                             });
                         }
                         setArNewChildrenAsReact(arChildrenAsReact);
-                        setShowModal(true);
+                        showModal(true);
                         // save off itemKey to be used for finishAssignment, etc.
                         setItemKey(key);
                     }
@@ -2901,7 +2882,7 @@ const ModalViewContainer = (props) => {
             else {
                 if (bShowModal) {
                     // console.log(`ModalViewContainer: useEffect setting bShowModal to false`)
-                    setShowModal(false);
+                    showModal(false);
                 }
                 if (!isEmptyObject(oCaseInfo)) {
                     setOCaseInfo({});
@@ -2922,12 +2903,13 @@ const ModalViewContainer = (props) => {
     //   console.log(`--> itemKey: ${itemKey}`);
     //   console.log(`--> arNewChildrenAsReact: ${JSON.stringify(arNewChildrenAsReact)}`);
     // }
-    return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_5__["default"], { classes: { root: 'customClass' }, "aria-labelledby": "form-dialog-title" },
-        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_6__["default"], { id: "form-dialog-title", className: classes.dlgTitle }, title),
-        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_7__["default"], { className: classes.dlgContent }, bShowModal ?
-            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Assignment__WEBPACK_IMPORTED_MODULE_2__["default"], { getPConnect: createdView.getPConnect, itemKey: itemKey }, arNewChildrenAsReact)
-            :
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null))));
+    return (bShowModal ?
+        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_5__["default"], { classes: { root: 'customClass' }, "aria-labelledby": "form-dialog-title" },
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_6__["default"], { id: "form-dialog-title", className: classes.dlgTitle }, title),
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_7__["default"], { className: classes.dlgContent },
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Assignment__WEBPACK_IMPORTED_MODULE_2__["default"], { getPConnect: createdView.getPConnect, itemKey: itemKey }, arNewChildrenAsReact)))
+        :
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null));
 };
 /* harmony default export */ __webpack_exports__["default"] = (ModalViewContainer);
 ModalViewContainer.defaultProps = {
@@ -6298,40 +6280,38 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": function() { return /* binding */ ListView; }
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
-/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_32___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_32__);
-/* harmony import */ var _material_ui_core_styles__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @material-ui/core/styles */ "./node_modules/@material-ui/core/esm/styles/makeStyles.js");
-/* harmony import */ var _material_ui_core_styles__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @material-ui/core/styles */ "./node_modules/@material-ui/core/esm/styles/createStyles.js");
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_31___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_31__);
+/* harmony import */ var _material_ui_core_styles__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @material-ui/core/styles */ "./node_modules/@material-ui/core/esm/styles/makeStyles.js");
+/* harmony import */ var _material_ui_core_styles__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @material-ui/core/styles */ "./node_modules/@material-ui/core/esm/styles/createStyles.js");
 /* harmony import */ var _helpers_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../helpers/utils */ "./src/helpers/utils.ts");
-/* harmony import */ var _material_ui_core_Table__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @material-ui/core/Table */ "./node_modules/@material-ui/core/esm/Table/Table.js");
-/* harmony import */ var _material_ui_core_TableBody__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @material-ui/core/TableBody */ "./node_modules/@material-ui/core/esm/TableBody/TableBody.js");
-/* harmony import */ var _material_ui_core_TableCell__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @material-ui/core/TableCell */ "./node_modules/@material-ui/core/esm/TableCell/TableCell.js");
-/* harmony import */ var _material_ui_core_TableContainer__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @material-ui/core/TableContainer */ "./node_modules/@material-ui/core/esm/TableContainer/TableContainer.js");
-/* harmony import */ var _material_ui_core_TableHead__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @material-ui/core/TableHead */ "./node_modules/@material-ui/core/esm/TableHead/TableHead.js");
-/* harmony import */ var _material_ui_core_TablePagination__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! @material-ui/core/TablePagination */ "./node_modules/@material-ui/core/esm/TablePagination/TablePagination.js");
-/* harmony import */ var _material_ui_core_TableRow__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @material-ui/core/TableRow */ "./node_modules/@material-ui/core/esm/TableRow/TableRow.js");
-/* harmony import */ var _material_ui_core_TableSortLabel__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @material-ui/core/TableSortLabel */ "./node_modules/@material-ui/core/esm/TableSortLabel/TableSortLabel.js");
-/* harmony import */ var _material_ui_core_Paper__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @material-ui/core/Paper */ "./node_modules/@material-ui/core/esm/Paper/Paper.js");
-/* harmony import */ var _material_ui_icons_MoreVert__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @material-ui/icons/MoreVert */ "./node_modules/@material-ui/icons/MoreVert.js");
-/* harmony import */ var _material_ui_icons_FilterList__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @material-ui/icons/FilterList */ "./node_modules/@material-ui/icons/FilterList.js");
-/* harmony import */ var _material_ui_icons_Subject__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! @material-ui/icons/Subject */ "./node_modules/@material-ui/icons/Subject.js");
-/* harmony import */ var _material_ui_icons_Search__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @material-ui/icons/Search */ "./node_modules/@material-ui/icons/Search.js");
-/* harmony import */ var _material_ui_core_TextField__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @material-ui/core/TextField */ "./node_modules/@material-ui/core/esm/TextField/TextField.js");
-/* harmony import */ var _material_ui_core_Grid__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @material-ui/core/Grid */ "./node_modules/@material-ui/core/esm/Grid/Grid.js");
-/* harmony import */ var _material_ui_core_Menu__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! @material-ui/core/Menu */ "./node_modules/@material-ui/core/esm/Menu/Menu.js");
-/* harmony import */ var _material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! @material-ui/core/MenuItem */ "./node_modules/@material-ui/core/esm/MenuItem/MenuItem.js");
-/* harmony import */ var _material_ui_core_Dialog__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! @material-ui/core/Dialog */ "./node_modules/@material-ui/core/esm/Dialog/Dialog.js");
-/* harmony import */ var _material_ui_core_DialogActions__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! @material-ui/core/DialogActions */ "./node_modules/@material-ui/core/esm/DialogActions/DialogActions.js");
-/* harmony import */ var _material_ui_core_DialogContent__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! @material-ui/core/DialogContent */ "./node_modules/@material-ui/core/esm/DialogContent/DialogContent.js");
-/* harmony import */ var _material_ui_core_DialogTitle__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! @material-ui/core/DialogTitle */ "./node_modules/@material-ui/core/esm/DialogTitle/DialogTitle.js");
-/* harmony import */ var _material_ui_core_Select__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! @material-ui/core/Select */ "./node_modules/@material-ui/core/esm/Select/Select.js");
-/* harmony import */ var _material_ui_core_Button__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! @material-ui/core/Button */ "./node_modules/@material-ui/core/esm/Button/Button.js");
-/* harmony import */ var _material_ui_core_Link__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @material-ui/core/Link */ "./node_modules/@material-ui/core/esm/Link/Link.js");
-/* harmony import */ var _material_ui_core_Typography__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @material-ui/core/Typography */ "./node_modules/@material-ui/core/esm/Typography/Typography.js");
-/* harmony import */ var _material_ui_core_Snackbar__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! @material-ui/core/Snackbar */ "./node_modules/@material-ui/core/esm/Snackbar/Snackbar.js");
-/* harmony import */ var _material_ui_core_IconButton__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! @material-ui/core/IconButton */ "./node_modules/@material-ui/core/esm/IconButton/IconButton.js");
-/* harmony import */ var _material_ui_icons_Close__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! @material-ui/icons/Close */ "./node_modules/@material-ui/icons/Close.js");
-
+/* harmony import */ var _material_ui_core_Table__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @material-ui/core/Table */ "./node_modules/@material-ui/core/esm/Table/Table.js");
+/* harmony import */ var _material_ui_core_TableBody__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @material-ui/core/TableBody */ "./node_modules/@material-ui/core/esm/TableBody/TableBody.js");
+/* harmony import */ var _material_ui_core_TableCell__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @material-ui/core/TableCell */ "./node_modules/@material-ui/core/esm/TableCell/TableCell.js");
+/* harmony import */ var _material_ui_core_TableContainer__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @material-ui/core/TableContainer */ "./node_modules/@material-ui/core/esm/TableContainer/TableContainer.js");
+/* harmony import */ var _material_ui_core_TableHead__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @material-ui/core/TableHead */ "./node_modules/@material-ui/core/esm/TableHead/TableHead.js");
+/* harmony import */ var _material_ui_core_TablePagination__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @material-ui/core/TablePagination */ "./node_modules/@material-ui/core/esm/TablePagination/TablePagination.js");
+/* harmony import */ var _material_ui_core_TableRow__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @material-ui/core/TableRow */ "./node_modules/@material-ui/core/esm/TableRow/TableRow.js");
+/* harmony import */ var _material_ui_core_TableSortLabel__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @material-ui/core/TableSortLabel */ "./node_modules/@material-ui/core/esm/TableSortLabel/TableSortLabel.js");
+/* harmony import */ var _material_ui_icons_MoreVert__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @material-ui/icons/MoreVert */ "./node_modules/@material-ui/icons/MoreVert.js");
+/* harmony import */ var _material_ui_icons_FilterList__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @material-ui/icons/FilterList */ "./node_modules/@material-ui/icons/FilterList.js");
+/* harmony import */ var _material_ui_icons_Subject__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! @material-ui/icons/Subject */ "./node_modules/@material-ui/icons/Subject.js");
+/* harmony import */ var _material_ui_core_Grid__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @material-ui/core/Grid */ "./node_modules/@material-ui/core/esm/Grid/Grid.js");
+/* harmony import */ var _material_ui_core_Menu__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! @material-ui/core/Menu */ "./node_modules/@material-ui/core/esm/Menu/Menu.js");
+/* harmony import */ var _material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! @material-ui/core/MenuItem */ "./node_modules/@material-ui/core/esm/MenuItem/MenuItem.js");
+/* harmony import */ var _material_ui_core_Dialog__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! @material-ui/core/Dialog */ "./node_modules/@material-ui/core/esm/Dialog/Dialog.js");
+/* harmony import */ var _material_ui_core_DialogActions__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! @material-ui/core/DialogActions */ "./node_modules/@material-ui/core/esm/DialogActions/DialogActions.js");
+/* harmony import */ var _material_ui_core_DialogContent__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! @material-ui/core/DialogContent */ "./node_modules/@material-ui/core/esm/DialogContent/DialogContent.js");
+/* harmony import */ var _material_ui_core_DialogTitle__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! @material-ui/core/DialogTitle */ "./node_modules/@material-ui/core/esm/DialogTitle/DialogTitle.js");
+/* harmony import */ var _material_ui_core_Select__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! @material-ui/core/Select */ "./node_modules/@material-ui/core/esm/Select/Select.js");
+/* harmony import */ var _material_ui_core_Button__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! @material-ui/core/Button */ "./node_modules/@material-ui/core/esm/Button/Button.js");
+/* harmony import */ var _material_ui_core_Link__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @material-ui/core/Link */ "./node_modules/@material-ui/core/esm/Link/Link.js");
+/* harmony import */ var _material_ui_core_Typography__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @material-ui/core/Typography */ "./node_modules/@material-ui/core/esm/Typography/Typography.js");
+/* harmony import */ var _material_ui_core_Snackbar__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! @material-ui/core/Snackbar */ "./node_modules/@material-ui/core/esm/Snackbar/Snackbar.js");
+/* harmony import */ var _material_ui_core_IconButton__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! @material-ui/core/IconButton */ "./node_modules/@material-ui/core/esm/IconButton/IconButton.js");
+/* harmony import */ var _material_ui_icons_Close__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! @material-ui/icons/Close */ "./node_modules/@material-ui/icons/Close.js");
+/* harmony import */ var _designSystem_TextField__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../designSystem/TextField */ "./src/designSystem/TextField/index.tsx");
+/* harmony import */ var _material_ui_core__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @material-ui/core */ "./node_modules/@material-ui/core/esm/Card/Card.js");
 
 
 
@@ -6388,7 +6368,8 @@ function ListView(props) {
     const [open, setOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
     const [showSnackbar, setShowSnackbar] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
     const [snackbarMessage, setSnackbarMessage] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("");
-    const useStyles = (0,_material_ui_core_styles__WEBPACK_IMPORTED_MODULE_2__["default"])((theme) => (0,_material_ui_core_styles__WEBPACK_IMPORTED_MODULE_3__["default"])({
+    const [assignmentSelected, setAssignmentSelected] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+    const useStyles = (0,_material_ui_core_styles__WEBPACK_IMPORTED_MODULE_3__["default"])((theme) => (0,_material_ui_core_styles__WEBPACK_IMPORTED_MODULE_4__["default"])({
         root: {
             width: '100%',
         },
@@ -6396,9 +6377,6 @@ function ListView(props) {
             width: '100%',
             marginTop: theme.spacing(2),
             marginBottom: theme.spacing(2),
-        },
-        search: {
-            padding: "5px 5px",
         },
         table: {
             minWidth: 750,
@@ -6415,7 +6393,13 @@ function ListView(props) {
             verticalAlign: "bottom"
         },
         cell: {
-            whiteSpace: "nowrap"
+            whiteSpace: "nowrap",
+            cursor: 'pointer'
+        },
+        row: {
+            '&:hover': {
+                'background-color': 'var(--app-base)'
+            }
         },
         visuallyHidden: {
             border: 0,
@@ -6610,7 +6594,7 @@ function ListView(props) {
             //  we can avoid calling the useState setters which would otherwise show a warning
             bCallSetRowsColumns = false;
         };
-    }, []);
+    }, [assignmentSelected]);
     function searchFilter(value, rows) {
         function filterArray(el) {
             const bReturn = false;
@@ -6649,9 +6633,14 @@ function ListView(props) {
         const { pxRefObjectClass, pzInsKey } = row;
         const sTarget = thePConn.getContainerName();
         const options = { "containerName": sTarget };
-        thePConn.getActionsApi().openAssignment(pzInsKey, pxRefObjectClass, options)
+        thePConn.getActionsApi().openAssignment(pzInsKey, pxRefObjectClass, {
+            containerName: sTarget,
+            context: "root"
+        })
             .then(() => {
             // console.log("openAssignment successful");
+            window.PCore.getPubSubUtils().subscribeOnce(window.PCore.getConstants().PUB_SUB_EVENTS.EVENT_CANCEL, () => setAssignmentSelected(false), "assignmentSelected");
+            setAssignmentSelected(true);
         })
             .catch(() => {
             showToast(`openAssignment failed!`);
@@ -6966,101 +6955,99 @@ function ListView(props) {
         return title;
     }
     return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null,
-        arColumns && arColumns.length > 0 &&
-            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Paper__WEBPACK_IMPORTED_MODULE_4__["default"], { className: classes.paper },
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Typography__WEBPACK_IMPORTED_MODULE_5__["default"], { className: classes.title, variant: "h6", color: "textPrimary", gutterBottom: true }, _listTitle()),
+        arColumns && arColumns.length > 0 && !assignmentSelected &&
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_5__["default"], { className: classes.paper },
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Typography__WEBPACK_IMPORTED_MODULE_6__["default"], { className: classes.title, variant: "h6", color: "textPrimary", gutterBottom: true }, _listTitle()),
                 globalSearch &&
-                    react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Grid__WEBPACK_IMPORTED_MODULE_6__["default"], { container: true, spacing: 1, alignItems: "flex-end", className: classes.search },
-                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Grid__WEBPACK_IMPORTED_MODULE_6__["default"], { item: true },
-                            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_icons_Search__WEBPACK_IMPORTED_MODULE_7__["default"], null)),
-                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Grid__WEBPACK_IMPORTED_MODULE_6__["default"], { item: true },
-                            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TextField__WEBPACK_IMPORTED_MODULE_8__["default"], { label: "Search", fullWidth: true, variant: "outlined", placeholder: "", size: "small", onChange: _onSearch }))),
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Grid__WEBPACK_IMPORTED_MODULE_7__["default"], { container: true, spacing: 1, alignItems: "flex-end" },
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Grid__WEBPACK_IMPORTED_MODULE_7__["default"], { item: true },
+                            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_designSystem_TextField__WEBPACK_IMPORTED_MODULE_2__["default"], { placeholder: "Search", onChange: _onSearch }))),
                 react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, bInForm ?
-                    react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableContainer__WEBPACK_IMPORTED_MODULE_9__["default"], { className: classes.tableInForm },
-                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Table__WEBPACK_IMPORTED_MODULE_10__["default"], { stickyHeader: true, "aria-label": "sticky table" },
-                            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableHead__WEBPACK_IMPORTED_MODULE_11__["default"], null,
-                                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableRow__WEBPACK_IMPORTED_MODULE_12__["default"], null, arColumns.map((column) => {
-                                    return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableCell__WEBPACK_IMPORTED_MODULE_13__["default"], { className: classes.cell, key: column.id, sortDirection: orderBy === column.id ? order : false },
-                                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableSortLabel__WEBPACK_IMPORTED_MODULE_14__["default"], { active: orderBy === column.id, direction: orderBy === column.id ? order : 'asc', onClick: createSortHandler(column.id) },
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableContainer__WEBPACK_IMPORTED_MODULE_8__["default"], { className: classes.tableInForm },
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Table__WEBPACK_IMPORTED_MODULE_9__["default"], { stickyHeader: true, "aria-label": "sticky table" },
+                            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableHead__WEBPACK_IMPORTED_MODULE_10__["default"], null,
+                                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableRow__WEBPACK_IMPORTED_MODULE_11__["default"], null, arColumns.map((column) => {
+                                    return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableCell__WEBPACK_IMPORTED_MODULE_12__["default"], { className: classes.cell, key: column.id, sortDirection: orderBy === column.id ? order : false },
+                                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableSortLabel__WEBPACK_IMPORTED_MODULE_13__["default"], { active: orderBy === column.id, direction: orderBy === column.id ? order : 'asc', onClick: createSortHandler(column.id) },
                                             column.label,
                                             _showFilteredIcon(column.id) &&
-                                                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_icons_FilterList__WEBPACK_IMPORTED_MODULE_15__["default"], { className: classes.filteredIcon }),
+                                                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_icons_FilterList__WEBPACK_IMPORTED_MODULE_14__["default"], { className: classes.filteredIcon }),
                                             orderBy === column.id ? (react__WEBPACK_IMPORTED_MODULE_0__.createElement("span", { className: classes.visuallyHidden }, order === 'desc' ? 'sorted descending' : 'sorted ascending')) : null),
-                                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_icons_MoreVert__WEBPACK_IMPORTED_MODULE_16__["default"], { className: classes.moreIcon, onClick: (event) => { _menuClick(event, column.id, column.type, column.label); } })));
+                                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_icons_MoreVert__WEBPACK_IMPORTED_MODULE_15__["default"], { className: classes.moreIcon, onClick: (event) => { _menuClick(event, column.id, column.type, column.label); } })));
                                 }))),
-                            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableBody__WEBPACK_IMPORTED_MODULE_17__["default"], null, stableSort(arRows, getComparator(order, orderBy))
+                            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableBody__WEBPACK_IMPORTED_MODULE_16__["default"], null, stableSort(arRows, getComparator(order, orderBy))
                                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                 .map((row) => {
-                                return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableRow__WEBPACK_IMPORTED_MODULE_12__["default"], { key: row.pxRefObjectInsName, onClick: () => { _rowClick(row); } }, arColumns.map((column) => {
+                                return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableRow__WEBPACK_IMPORTED_MODULE_11__["default"], { className: classes.row, key: row.pxRefObjectInsName, onClick: () => { _rowClick(row); } }, arColumns.map((column) => {
                                     const value = row[column.id];
-                                    return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableCell__WEBPACK_IMPORTED_MODULE_13__["default"], { key: column.id, align: column.align, className: classes.cell }, _showButton(column.id, row) ?
-                                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Link__WEBPACK_IMPORTED_MODULE_18__["default"], { component: "button", onClick: () => { _listViewClick(column.id, row); } }, column.format && typeof value === 'number' ? column.format(value) : value)
+                                    return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableCell__WEBPACK_IMPORTED_MODULE_12__["default"], { key: column.id, align: column.align, className: classes.cell }, _showButton(column.id, row) ?
+                                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Link__WEBPACK_IMPORTED_MODULE_17__["default"], { component: "button", onClick: () => { _listViewClick(column.id, row); } }, column.format && typeof value === 'number' ? column.format(value) : value)
                                         :
                                             react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, column.format && typeof value === 'number' ? column.format(value) : value)));
                                 })));
                             }))))
                     :
-                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableContainer__WEBPACK_IMPORTED_MODULE_9__["default"], null,
-                            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Table__WEBPACK_IMPORTED_MODULE_10__["default"], null,
-                                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableHead__WEBPACK_IMPORTED_MODULE_11__["default"], null,
-                                    react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableRow__WEBPACK_IMPORTED_MODULE_12__["default"], null, arColumns.map((column) => {
-                                        return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableCell__WEBPACK_IMPORTED_MODULE_13__["default"], { className: classes.cell, key: column.id, sortDirection: orderBy === column.id ? order : false },
-                                            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableSortLabel__WEBPACK_IMPORTED_MODULE_14__["default"], { active: orderBy === column.id, direction: orderBy === column.id ? order : 'asc', onClick: createSortHandler(column.id) },
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableContainer__WEBPACK_IMPORTED_MODULE_8__["default"], null,
+                            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Table__WEBPACK_IMPORTED_MODULE_9__["default"], null,
+                                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableHead__WEBPACK_IMPORTED_MODULE_10__["default"], null,
+                                    react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableRow__WEBPACK_IMPORTED_MODULE_11__["default"], null, arColumns.map((column) => {
+                                        return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableCell__WEBPACK_IMPORTED_MODULE_12__["default"], { className: classes.cell, key: column.id, sortDirection: orderBy === column.id ? order : false },
+                                            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableSortLabel__WEBPACK_IMPORTED_MODULE_13__["default"], { active: orderBy === column.id, direction: orderBy === column.id ? order : 'asc', onClick: createSortHandler(column.id) },
                                                 column.label,
                                                 orderBy === column.id ? (react__WEBPACK_IMPORTED_MODULE_0__.createElement("span", { className: classes.visuallyHidden }, order === 'desc' ? 'sorted descending' : 'sorted ascending')) : null)));
                                     }))),
-                                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableBody__WEBPACK_IMPORTED_MODULE_17__["default"], null, stableSort(arRows, getComparator(order, orderBy))
+                                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableBody__WEBPACK_IMPORTED_MODULE_16__["default"], null, stableSort(arRows, getComparator(order, orderBy))
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map((row) => {
-                                    return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableRow__WEBPACK_IMPORTED_MODULE_12__["default"], { key: row.pxRefObjectInsName, onClick: () => { _rowClick(row); } }, arColumns.map((column) => {
+                                    return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableRow__WEBPACK_IMPORTED_MODULE_11__["default"], { className: classes.row, key: row.pxRefObjectInsName, onClick: () => { _rowClick(row); } }, arColumns.map((column) => {
                                         const value = row[column.id];
-                                        return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableCell__WEBPACK_IMPORTED_MODULE_13__["default"], { className: classes.cell, key: column.id, align: column.align }, column.format && typeof value === 'number' ? column.format(value) : value));
+                                        return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TableCell__WEBPACK_IMPORTED_MODULE_12__["default"], { className: classes.cell, key: column.id, align: column.align }, column.format && typeof value === 'number' ? column.format(value) : value));
                                     })));
                                 }))))),
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TablePagination__WEBPACK_IMPORTED_MODULE_19__["default"], { rowsPerPageOptions: [10, 25, 100], component: "div", count: arRows.length, rowsPerPage: rowsPerPage, page: page, onPageChange: handleChangePage, onRowsPerPageChange: handleChangeRowsPerPage })),
-        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Menu__WEBPACK_IMPORTED_MODULE_20__["default"], { id: "simple-menu", anchorEl: anchorEl, keepMounted: true, open: Boolean(anchorEl), onClose: _menuClose },
-            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_21__["default"], { onClick: _filterMenu },
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_icons_FilterList__WEBPACK_IMPORTED_MODULE_15__["default"], null),
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TablePagination__WEBPACK_IMPORTED_MODULE_18__["default"], { rowsPerPageOptions: [10, 25, 100], component: "div", count: arRows.length, rowsPerPage: rowsPerPage, page: page, onPageChange: handleChangePage, onRowsPerPageChange: handleChangeRowsPerPage })),
+        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Menu__WEBPACK_IMPORTED_MODULE_19__["default"], { id: "simple-menu", anchorEl: anchorEl, keepMounted: true, open: Boolean(anchorEl), onClose: _menuClose },
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_20__["default"], { onClick: _filterMenu },
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_icons_FilterList__WEBPACK_IMPORTED_MODULE_14__["default"], null),
                 " Filter"),
-            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_21__["default"], { onClick: _groupMenu },
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_icons_Subject__WEBPACK_IMPORTED_MODULE_22__["default"], null),
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_20__["default"], { onClick: _groupMenu },
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_icons_Subject__WEBPACK_IMPORTED_MODULE_21__["default"], null),
                 " Group")),
-        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Dialog__WEBPACK_IMPORTED_MODULE_23__["default"], { open: open, onClose: _closeDialog, "aria-labelledby": "form-dialog-title" },
-            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_DialogTitle__WEBPACK_IMPORTED_MODULE_24__["default"], { id: "form-dialog-title" },
+        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Dialog__WEBPACK_IMPORTED_MODULE_22__["default"], { open: open, onClose: _closeDialog, "aria-labelledby": "form-dialog-title" },
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_DialogTitle__WEBPACK_IMPORTED_MODULE_23__["default"], { id: "form-dialog-title" },
                 "Filter: ",
                 filterBy),
-            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_DialogContent__WEBPACK_IMPORTED_MODULE_25__["default"], null, containsDateOrTime ?
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_DialogContent__WEBPACK_IMPORTED_MODULE_24__["default"], null, containsDateOrTime ?
                 react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null,
-                    react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Select__WEBPACK_IMPORTED_MODULE_26__["default"], { value: displayDialogDateFilter, onChange: _dialogDateFilter, fullWidth: true },
-                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_21__["default"], { value: "notequal" }, "is not equal to"),
-                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_21__["default"], { value: "after" }, "after"),
-                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_21__["default"], { value: "before" }, "before"),
-                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_21__["default"], { value: "null" }, "is null"),
-                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_21__["default"], { value: "notnull" }, "is not null")),
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Select__WEBPACK_IMPORTED_MODULE_25__["default"], { value: displayDialogDateFilter, onChange: _dialogDateFilter, fullWidth: true },
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_20__["default"], { value: "notequal" }, "is not equal to"),
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_20__["default"], { value: "after" }, "after"),
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_20__["default"], { value: "before" }, "before"),
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_20__["default"], { value: "null" }, "is null"),
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_20__["default"], { value: "notnull" }, "is not null")),
                     filterType === "Date" &&
-                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TextField__WEBPACK_IMPORTED_MODULE_8__["default"], { autoFocus: true, margin: "dense", id: "containsFilter", type: "date", fullWidth: true, value: displayDialogDateValue, onChange: _dialogDateValue }),
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_designSystem_TextField__WEBPACK_IMPORTED_MODULE_2__["default"], { id: "containsFilter", type: "date", value: displayDialogDateValue, onChange: _dialogDateValue }),
                     filterType === "DateTime" &&
-                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TextField__WEBPACK_IMPORTED_MODULE_8__["default"], { autoFocus: true, margin: "dense", id: "containsFilter", type: "datetime-local", fullWidth: true, value: displayDialogDateValue, onChange: _dialogDateValue }),
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_designSystem_TextField__WEBPACK_IMPORTED_MODULE_2__["default"], { id: "containsFilter", type: "datetime-local", value: displayDialogDateValue, onChange: _dialogDateValue }),
                     filterType === "Time" &&
-                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TextField__WEBPACK_IMPORTED_MODULE_8__["default"], { autoFocus: true, margin: "dense", id: "containsFilter", type: "time", fullWidth: true, value: displayDialogDateValue, onChange: _dialogDateValue }))
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_designSystem_TextField__WEBPACK_IMPORTED_MODULE_2__["default"], { id: "containsFilter", type: "time", value: displayDialogDateValue, onChange: _dialogDateValue }))
                 :
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null,
-                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Select__WEBPACK_IMPORTED_MODULE_26__["default"], { fullWidth: true, onChange: _dialogContainsFilter, value: displayDialogContainsFilter },
-                            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_21__["default"], { value: "contains" }, "Contains"),
-                            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_21__["default"], { value: "equals" }, "Equals"),
-                            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_21__["default"], { value: "startswith" }, "Starts with")),
-                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_TextField__WEBPACK_IMPORTED_MODULE_8__["default"], { autoFocus: true, margin: "dense", id: "containsFilter", type: "text", fullWidth: true, value: displayDialogContainsValue, onChange: _dialogContainsValue }))),
-            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_DialogActions__WEBPACK_IMPORTED_MODULE_27__["default"], null,
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Button__WEBPACK_IMPORTED_MODULE_28__["default"], { onClick: _closeDialog, color: "secondary" }, "Cancel"),
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Button__WEBPACK_IMPORTED_MODULE_28__["default"], { onClick: _submitFilter, color: "primary" }, "Submit"))),
-        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Snackbar__WEBPACK_IMPORTED_MODULE_29__["default"], { open: showSnackbar, autoHideDuration: 3000, onClose: handleSnackbarClose, message: snackbarMessage, action: react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_IconButton__WEBPACK_IMPORTED_MODULE_30__["default"], { size: "small", "aria-label": "close", color: "inherit", onClick: handleSnackbarClose },
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_icons_Close__WEBPACK_IMPORTED_MODULE_31__["default"], { fontSize: "small" })) })));
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Select__WEBPACK_IMPORTED_MODULE_25__["default"], { fullWidth: true, onChange: _dialogContainsFilter, value: displayDialogContainsFilter },
+                            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_20__["default"], { value: "contains" }, "Contains"),
+                            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_20__["default"], { value: "equals" }, "Equals"),
+                            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_MenuItem__WEBPACK_IMPORTED_MODULE_20__["default"], { value: "startswith" }, "Starts with")),
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_designSystem_TextField__WEBPACK_IMPORTED_MODULE_2__["default"], { id: "containsFilter", type: "text", value: displayDialogContainsValue, onChange: _dialogContainsValue }))),
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_DialogActions__WEBPACK_IMPORTED_MODULE_26__["default"], null,
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Button__WEBPACK_IMPORTED_MODULE_27__["default"], { onClick: _closeDialog, color: "secondary" }, "Cancel"),
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Button__WEBPACK_IMPORTED_MODULE_27__["default"], { onClick: _submitFilter, color: "primary" }, "Submit"))),
+        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_Snackbar__WEBPACK_IMPORTED_MODULE_28__["default"], { open: showSnackbar, autoHideDuration: 3000, onClose: handleSnackbarClose, message: snackbarMessage, action: react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core_IconButton__WEBPACK_IMPORTED_MODULE_29__["default"], { size: "small", "aria-label": "close", color: "inherit", onClick: handleSnackbarClose },
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_icons_Close__WEBPACK_IMPORTED_MODULE_30__["default"], { fontSize: "small" })) })));
 }
 ListView.defaultProps = {
 // parameters: undefined
 };
 ListView.propTypes = {
-    getPConnect: (prop_types__WEBPACK_IMPORTED_MODULE_32___default().func.isRequired),
+    getPConnect: (prop_types__WEBPACK_IMPORTED_MODULE_31___default().func.isRequired),
     // parameters: PropTypes.objectOf(PropTypes.any)
 };
 
@@ -9933,10 +9920,11 @@ class TextField extends react__WEBPACK_IMPORTED_MODULE_1__.Component {
     }
     handleChange(e) {
         this.setState({ value: e.target.value });
-        this.props.onChange(e);
+        if (this.props.onChange)
+            this.props.onChange(e);
     }
     render() {
-        return react__WEBPACK_IMPORTED_MODULE_1__.createElement("label", { className: `input-label${this.props.required ? ' required' : ''}${this.props.error ? ' invalid' : ''}` },
+        return react__WEBPACK_IMPORTED_MODULE_1__.createElement("label", { id: this.props.id, className: `input-label${this.props.required ? ' required' : ''}${this.props.error ? ' invalid' : ''}` },
             react__WEBPACK_IMPORTED_MODULE_1__.createElement("span", null, this.props.label),
             " ",
             this.props.helperText && !this.props.error ? react__WEBPACK_IMPORTED_MODULE_1__.createElement("span", { title: this.props.helperText },
@@ -9944,10 +9932,11 @@ class TextField extends react__WEBPACK_IMPORTED_MODULE_1__.Component {
             this.props.select ?
                 react__WEBPACK_IMPORTED_MODULE_1__.createElement("select", { required: this.props.required, disabled: this.props.disabled, value: this.state.value, onChange: e => this.handleChange(e) }, this.props.children) :
                 react__WEBPACK_IMPORTED_MODULE_1__.createElement("input", { type: this.props.type || 'text', required: this.props.required, disabled: this.props.disabled, readOnly: this.props.readOnly, placeholder: this.props.placeholder, value: this.state.value, onChange: e => this.handleChange(e) }),
-            this.props.select || this.props.type === 'email' ?
+            this.props.select || (this.props.type && ['email', 'search'].indexOf(this.props.type) >= 0) ?
                 react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", { className: "input-icon" }, this.props.select ?
                     react__WEBPACK_IMPORTED_MODULE_1__.createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_0__.FontAwesomeIcon, { icon: _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_3__.faAngleDown }) :
-                    react__WEBPACK_IMPORTED_MODULE_1__.createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_0__.FontAwesomeIcon, { icon: _fortawesome_free_regular_svg_icons__WEBPACK_IMPORTED_MODULE_2__.faEnvelope })) : null,
+                    this.props.type === 'email' ? react__WEBPACK_IMPORTED_MODULE_1__.createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_0__.FontAwesomeIcon, { icon: _fortawesome_free_regular_svg_icons__WEBPACK_IMPORTED_MODULE_2__.faEnvelope }) :
+                        this.props.type === 'search' ? react__WEBPACK_IMPORTED_MODULE_1__.createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_0__.FontAwesomeIcon, { icon: _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_3__.faSearch }) : null) : null,
             this.props.helperText && this.props.error ? react__WEBPACK_IMPORTED_MODULE_1__.createElement("span", { className: "helperText" }, this.props.helperText) : null);
     }
 }

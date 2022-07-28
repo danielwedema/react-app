@@ -57800,10 +57800,11 @@ class TextField extends react__WEBPACK_IMPORTED_MODULE_1__.Component {
     }
     handleChange(e) {
         this.setState({ value: e.target.value });
-        this.props.onChange(e);
+        if (this.props.onChange)
+            this.props.onChange(e);
     }
     render() {
-        return react__WEBPACK_IMPORTED_MODULE_1__.createElement("label", { className: `input-label${this.props.required ? ' required' : ''}${this.props.error ? ' invalid' : ''}` },
+        return react__WEBPACK_IMPORTED_MODULE_1__.createElement("label", { id: this.props.id, className: `input-label${this.props.required ? ' required' : ''}${this.props.error ? ' invalid' : ''}` },
             react__WEBPACK_IMPORTED_MODULE_1__.createElement("span", null, this.props.label),
             " ",
             this.props.helperText && !this.props.error ? react__WEBPACK_IMPORTED_MODULE_1__.createElement("span", { title: this.props.helperText },
@@ -57811,10 +57812,11 @@ class TextField extends react__WEBPACK_IMPORTED_MODULE_1__.Component {
             this.props.select ?
                 react__WEBPACK_IMPORTED_MODULE_1__.createElement("select", { required: this.props.required, disabled: this.props.disabled, value: this.state.value, onChange: e => this.handleChange(e) }, this.props.children) :
                 react__WEBPACK_IMPORTED_MODULE_1__.createElement("input", { type: this.props.type || 'text', required: this.props.required, disabled: this.props.disabled, readOnly: this.props.readOnly, placeholder: this.props.placeholder, value: this.state.value, onChange: e => this.handleChange(e) }),
-            this.props.select || this.props.type === 'email' ?
+            this.props.select || (this.props.type && ['email', 'search'].indexOf(this.props.type) >= 0) ?
                 react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", { className: "input-icon" }, this.props.select ?
                     react__WEBPACK_IMPORTED_MODULE_1__.createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_0__.FontAwesomeIcon, { icon: _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_3__.faAngleDown }) :
-                    react__WEBPACK_IMPORTED_MODULE_1__.createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_0__.FontAwesomeIcon, { icon: _fortawesome_free_regular_svg_icons__WEBPACK_IMPORTED_MODULE_2__.faEnvelope })) : null,
+                    this.props.type === 'email' ? react__WEBPACK_IMPORTED_MODULE_1__.createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_0__.FontAwesomeIcon, { icon: _fortawesome_free_regular_svg_icons__WEBPACK_IMPORTED_MODULE_2__.faEnvelope }) :
+                        this.props.type === 'search' ? react__WEBPACK_IMPORTED_MODULE_1__.createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_0__.FontAwesomeIcon, { icon: _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_3__.faSearch }) : null) : null,
             this.props.helperText && this.props.error ? react__WEBPACK_IMPORTED_MODULE_1__.createElement("span", { className: "helperText" }, this.props.helperText) : null);
     }
 }
