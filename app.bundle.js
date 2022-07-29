@@ -401,7 +401,7 @@ function startCase(caseTypeId, content) {
 function continueCase(assignmentId, className) {
     return __awaiter(this, void 0, void 0, function* () {
         return window.PConn.getActionsApi().openAssignment(assignmentId, className, {
-            containerName: "modal",
+            containerName: "primary",
             context: "root",
             isActionFromToDoList: true,
             isChild: undefined,
