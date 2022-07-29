@@ -1196,6 +1196,7 @@ __webpack_require__.r(__webpack_exports__);
 
 function ActionButtons(props) {
     const { arMainButtons, arSecondaryButtons, onButtonPress } = props;
+    const allButtons = [...arMainButtons, ...arSecondaryButtons];
     function _onButtonPress(sAction, sButtonType) {
         onButtonPress(sAction, sButtonType);
     }
@@ -1203,11 +1204,14 @@ function ActionButtons(props) {
         react__WEBPACK_IMPORTED_MODULE_0__.createElement(_designSystem_Divider__WEBPACK_IMPORTED_MODULE_2__["default"], null),
         react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_3__["default"], { container: true, spacing: 4, justifyContent: "space-between" },
             react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_3__["default"], { item: true },
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_3__["default"], { container: true, spacing: 1 }, arSecondaryButtons.map((sButton) => (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_3__["default"], { item: true, key: sButton.name },
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_3__["default"], { container: true, spacing: 1 }, allButtons.filter(button => button.jsAction === 'cancelAssignment').map((sButton) => (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_3__["default"], { item: true, key: sButton.name },
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement(_designSystem_Button__WEBPACK_IMPORTED_MODULE_1__["default"], { variant: "contained", color: "secondary", onClick: () => { _onButtonPress(sButton.jsAction, "secondary"); } }, sButton.name)))))),
             react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_3__["default"], { item: true },
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_3__["default"], { container: true, spacing: 1 }, arMainButtons.map((mButton) => (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_3__["default"], { item: true, key: mButton.name },
-                    react__WEBPACK_IMPORTED_MODULE_0__.createElement(_designSystem_Button__WEBPACK_IMPORTED_MODULE_1__["default"], { variant: "contained", color: "primary", onClick: () => { _onButtonPress(mButton.jsAction, "primary"); } }, mButton.name)))))))));
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_3__["default"], { container: true, spacing: 1 },
+                    arSecondaryButtons.filter(button => button.jsAction !== 'cancelAssignment').map((mButton) => (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_3__["default"], { item: true, key: mButton.name },
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_designSystem_Button__WEBPACK_IMPORTED_MODULE_1__["default"], { variant: "contained", color: "secondary", onClick: () => { _onButtonPress(mButton.jsAction, "primary"); } }, mButton.name)))),
+                    arMainButtons.filter(button => button.jsAction !== 'cancelAssignment').map((mButton) => (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_3__["default"], { item: true, key: mButton.name },
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_designSystem_Button__WEBPACK_IMPORTED_MODULE_1__["default"], { variant: "contained", color: "primary", onClick: () => { _onButtonPress(mButton.jsAction, "primary"); } }, mButton.name)))))))));
 }
 ActionButtons.propTypes = {
     arMainButtons: (prop_types__WEBPACK_IMPORTED_MODULE_4___default().array),
@@ -1262,6 +1266,8 @@ function Assignment(props) {
     const finishAssignment = actionsAPI.finishAssignment.bind(actionsAPI);
     const navigateToStep = actionsAPI.navigateToStep.bind(actionsAPI);
     const cancelAssignment = actionsAPI.cancelAssignment.bind(actionsAPI);
+    const approveCase = actionsAPI.approveCase.bind(actionsAPI);
+    const rejectCase = actionsAPI.approveCase.bind(actionsAPI);
     // const showPage = actionsAPI.showPage.bind(actionsAPI);
     const [showSnackbar, setShowSnackbar] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
     const [snackbarMessage, setSnackbarMessage] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("");
@@ -1357,6 +1363,16 @@ function Assignment(props) {
                     });
                     break;
                 }
+                case "rejectCase":
+                    const rejectPromise = rejectCase(dispatchInfo.context);
+                    rejectPromise
+                        .then(() => {
+                        PCore.getPubSubUtils().publish(PCore.getConstants().PUB_SUB_EVENTS.EVENT_CANCEL);
+                    })
+                        .catch(() => {
+                        showToast(`Cancel failed!`);
+                    });
+                    break;
                 default:
                     break;
             }
@@ -1375,6 +1391,15 @@ function Assignment(props) {
                         });
                         break;
                     }
+                case "approveCase":
+                    const approvePromise = approveCase(itemKey);
+                    approvePromise
+                        .then(() => {
+                    })
+                        .catch(() => {
+                        showToast(`Case approved!`);
+                    });
+                    break;
                 default:
                     break;
             }
@@ -5173,7 +5198,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": function() { return /* binding */ TextArea; }
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _material_ui_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @material-ui/core */ "./node_modules/@material-ui/core/esm/TextField/TextField.js");
+/* harmony import */ var _designSystem_TextField__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../designSystem/TextField */ "./src/designSystem/TextField/index.tsx");
 
 
 function TextArea(props) {
@@ -5188,7 +5213,7 @@ function TextArea(props) {
     testProp = {
         "data-test-id": testId
     };
-    return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["default"], { multiline: true, minRows: 5, maxRows: 5, fullWidth: true, variant: readOnly ? "standard" : "outlined", helperText: validatemessage, placeholder: "", size: "small", required: required, disabled: disabled, onChange: onChange, onBlur: onBlur, error: status === "error", label: label, value: value, InputProps: Object.assign(Object.assign({}, readOnlyProp), { inputProps: Object.assign({}, testProp) }) }));
+    return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_designSystem_TextField__WEBPACK_IMPORTED_MODULE_1__["default"], { multiline: true, minRows: 5, maxRows: 5, helperText: validatemessage, required: required, disabled: disabled, onChange: onChange, onBlur: onBlur, error: status === "error", label: label, value: value }));
 }
 
 
@@ -9931,7 +9956,9 @@ class TextField extends react__WEBPACK_IMPORTED_MODULE_1__.Component {
                 react__WEBPACK_IMPORTED_MODULE_1__.createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_0__.FontAwesomeIcon, { icon: _fortawesome_free_regular_svg_icons__WEBPACK_IMPORTED_MODULE_2__.faCircleQuestion })) : null,
             this.props.select ?
                 react__WEBPACK_IMPORTED_MODULE_1__.createElement("select", { required: this.props.required, disabled: this.props.disabled, value: this.state.value, onChange: e => this.handleChange(e) }, this.props.children) :
-                react__WEBPACK_IMPORTED_MODULE_1__.createElement("input", { type: this.props.type || 'text', required: this.props.required, disabled: this.props.disabled, readOnly: this.props.readOnly, placeholder: this.props.placeholder, value: this.state.value, onChange: e => this.handleChange(e) }),
+                this.props.multiline ?
+                    react__WEBPACK_IMPORTED_MODULE_1__.createElement("textarea", { required: this.props.required, disabled: this.props.disabled, readOnly: this.props.readOnly, placeholder: this.props.placeholder, value: this.state.value, onChange: e => this.handleChange(e) }) :
+                    react__WEBPACK_IMPORTED_MODULE_1__.createElement("input", { type: this.props.type || 'text', required: this.props.required, disabled: this.props.disabled, readOnly: this.props.readOnly, placeholder: this.props.placeholder, value: this.state.value, onChange: e => this.handleChange(e) }),
             this.props.select || (this.props.type && ['email', 'search'].indexOf(this.props.type) >= 0) ?
                 react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", { className: "input-icon" }, this.props.select ?
                     react__WEBPACK_IMPORTED_MODULE_1__.createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_0__.FontAwesomeIcon, { icon: _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_3__.faAngleDown }) :

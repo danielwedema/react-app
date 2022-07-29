@@ -57811,7 +57811,9 @@ class TextField extends react__WEBPACK_IMPORTED_MODULE_1__.Component {
                 react__WEBPACK_IMPORTED_MODULE_1__.createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_0__.FontAwesomeIcon, { icon: _fortawesome_free_regular_svg_icons__WEBPACK_IMPORTED_MODULE_2__.faCircleQuestion })) : null,
             this.props.select ?
                 react__WEBPACK_IMPORTED_MODULE_1__.createElement("select", { required: this.props.required, disabled: this.props.disabled, value: this.state.value, onChange: e => this.handleChange(e) }, this.props.children) :
-                react__WEBPACK_IMPORTED_MODULE_1__.createElement("input", { type: this.props.type || 'text', required: this.props.required, disabled: this.props.disabled, readOnly: this.props.readOnly, placeholder: this.props.placeholder, value: this.state.value, onChange: e => this.handleChange(e) }),
+                this.props.multiline ?
+                    react__WEBPACK_IMPORTED_MODULE_1__.createElement("textarea", { required: this.props.required, disabled: this.props.disabled, readOnly: this.props.readOnly, placeholder: this.props.placeholder, value: this.state.value, onChange: e => this.handleChange(e) }) :
+                    react__WEBPACK_IMPORTED_MODULE_1__.createElement("input", { type: this.props.type || 'text', required: this.props.required, disabled: this.props.disabled, readOnly: this.props.readOnly, placeholder: this.props.placeholder, value: this.state.value, onChange: e => this.handleChange(e) }),
             this.props.select || (this.props.type && ['email', 'search'].indexOf(this.props.type) >= 0) ?
                 react__WEBPACK_IMPORTED_MODULE_1__.createElement("div", { className: "input-icon" }, this.props.select ?
                     react__WEBPACK_IMPORTED_MODULE_1__.createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_0__.FontAwesomeIcon, { icon: _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_3__.faAngleDown }) :
