@@ -15,6 +15,10 @@
     <div id="outlet"></div>
     <script>
       (async () => {
+        const searchParams = new URL(window.location.href).searchParams;
+        const assignmentID = searchParams.get('assignmentID');
+        const className = searchParams.get('className');
+ 
         await window.pega.initPega({
           authConfig: {
             jwtUri: "http://localhost:8081"
@@ -28,8 +32,11 @@
         });
         await window.pega.initMashup(document.getElementById('outlet'));
         // await window.pega.startCase('LABB-DX-Work-Resignation', {});
-        await window.pega.startCase('SSCL-Leaver-Work-Resignation', {});
-        // await window.pega.continueCase('ASSIGN-WORKLIST SSCL-LEAVER-WORK R-24015!CREATEFORM_DEFAULT', 'SSCL-Leaver-Work-Resignation')
+        if (assignmentID && className) {
+          await window.pega.continueCase(assignmentID, className);
+        } else {
+          await window.pega.startCase('SSCL-Leaver-Work-Resignation', {});
+        }
       })();
     </script>
   </body>
