@@ -395,7 +395,10 @@ function startCase(caseTypeId, content) {
             caseInfo: { content: content }
             //   , pageName: 'pyEmbedAssignment' 
         });
-        // return window.createCase(null, caseTypeId);
+        yield window.PCore.getMashupApi().createCase(caseTypeId, 'root', {
+            pageName: 'pyEmbedAssignment',
+            startingFields: content
+        });
     });
 }
 function continueCase(assignmentId, className) {
@@ -463,6 +466,7 @@ function initPega(config, element) {
         // div.appendChild(createStyleSheet('/assets/css/sdkStyles.css'));
         // element.prepend(div);
         const jwt = yield (yield fetch(config.authConfig.jwtUri)).text();
+        const token = yield (yield fetch(`${config.authConfig.tokenUri}?token=${jwt}`)).json();
         const bootstrapShell = yield import(/* webpackIgnore: true */ `${config.serverConfig.sdkContentServerUrl}bootstrap-shell.js`);
         window.loadView = bootstrapShell.loadView;
         window.loadPortal = bootstrapShell.loadPortal;
@@ -479,8 +483,8 @@ function initPega(config, element) {
             const constellationConfig = {
                 authInfo: {
                     tokenInfo: {
-                        token_type: 'bearer',
-                        access_token: jwt
+                        token_type: 'Bearer',
+                        access_token: token.access_token
                     }
                 },
                 restServerUrl: config.serverConfig.infinityRestServerUrl,

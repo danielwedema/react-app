@@ -21,10 +21,11 @@
  
         await window.pega.initPega({
           authConfig: {
-            jwtUri: "http://localhost:8081"
+            jwtUri: "http://localhost:8081/serviceplus/_config/dev/jwt",
+            tokenUri: "http://localhost:8081/serviceplus/_config/dev/api/token"
           },
           serverConfig: {
-            infinityRestServerUrl: "https://sscl-cst-dt3.pegacloud.net/prweb",
+            infinityRestServerUrl: "https://apiservices.dev.sscl.com:8065",
             // infinityRestServerUrl: "https://labbconsulting02.pegalabs.io/prweb",
             // infinityRestServerUrl: "http://localhost:9905/prweb",
             sdkContentServerUrl: "http://localhost:3502/constellation/"
@@ -36,6 +37,7 @@
           await window.pega.continueCase(assignmentID, className);
         } else {
           await window.pega.startCase('SSCL-Leaver-Work-Resignation', {});
+          // await window.pega.startCase('LABB-DX-Work-Resignation', {});
         }
       })();
     </script>
