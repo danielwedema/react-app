@@ -2659,24 +2659,21 @@ FlowContainer.propTypes = {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
-/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_8__);
-/* harmony import */ var _material_ui_core_styles__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @material-ui/core/styles */ "./node_modules/@material-ui/core/esm/styles/makeStyles.js");
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var _material_ui_core_styles__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @material-ui/core/styles */ "./node_modules/@material-ui/core/esm/styles/makeStyles.js");
 /* harmony import */ var _bridge_react_pconnect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../bridge/react_pconnect */ "./src/bridge/react_pconnect.jsx");
 /* harmony import */ var _Assignment__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Assignment */ "./src/components/Assignment/index.tsx");
-/* harmony import */ var fast_deep_equal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! fast-deep-equal */ "./node_modules/fast-deep-equal/index.js");
-/* harmony import */ var fast_deep_equal__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(fast_deep_equal__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _material_ui_core__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @material-ui/core */ "./node_modules/@material-ui/core/esm/Card/Card.js");
-/* harmony import */ var _material_ui_core__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @material-ui/core */ "./node_modules/@material-ui/core/esm/CardHeader/CardHeader.js");
-/* harmony import */ var _material_ui_core__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @material-ui/core */ "./node_modules/@material-ui/core/esm/CardContent/CardContent.js");
+/* harmony import */ var _material_ui_core__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @material-ui/core */ "./node_modules/@material-ui/core/esm/Card/Card.js");
+/* harmony import */ var _material_ui_core__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @material-ui/core */ "./node_modules/@material-ui/core/esm/CardHeader/CardHeader.js");
+/* harmony import */ var _material_ui_core__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @material-ui/core */ "./node_modules/@material-ui/core/esm/CardContent/CardContent.js");
 
 
 
 
 
 
-
-const useStyles = (0,_material_ui_core_styles__WEBPACK_IMPORTED_MODULE_4__["default"])((theme) => ({
+const useStyles = (0,_material_ui_core_styles__WEBPACK_IMPORTED_MODULE_3__["default"])((theme) => ({
     dlgTitle: {
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
@@ -2768,17 +2765,16 @@ const ModalViewContainer = (props) => {
     function compareCaseInfoIsDifferent(oCurrentCaseInfo) {
         let bRet = false;
         // fast-deep-equal version
-        if (fast_deep_equal__WEBPACK_IMPORTED_MODULE_3__ !== undefined) {
-            bRet = !fast_deep_equal__WEBPACK_IMPORTED_MODULE_3__(oCaseInfo, oCurrentCaseInfo);
+        // if (isEqual !== undefined) {
+        //   bRet = !isEqual(oCaseInfo, oCurrentCaseInfo);
+        // } else {
+        const sCurrentCaseInfo = JSON.stringify(oCurrentCaseInfo);
+        const sOldCaseInfo = JSON.stringify(oCaseInfo);
+        // stringify compare version
+        if (sCurrentCaseInfo !== sOldCaseInfo) {
+            bRet = true;
         }
-        else {
-            const sCurrentCaseInfo = JSON.stringify(oCurrentCaseInfo);
-            const sOldCaseInfo = JSON.stringify(oCaseInfo);
-            // stringify compare version
-            if (sCurrentCaseInfo !== sOldCaseInfo) {
-                bRet = true;
-            }
-        }
+        // }
         // if different, save off new case info
         if (bRet) {
             setOCaseInfo(JSON.parse(JSON.stringify(oCurrentCaseInfo)));
@@ -2929,9 +2925,9 @@ const ModalViewContainer = (props) => {
     //   console.log(`--> arNewChildrenAsReact: ${JSON.stringify(arNewChildrenAsReact)}`);
     // }
     return (bShowModal ?
-        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_5__["default"], { classes: { root: 'customClass' }, "aria-labelledby": "form-dialog-title" },
-            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_6__["default"], { id: "form-dialog-title", className: classes.dlgTitle }, title),
-            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_7__["default"], { className: classes.dlgContent },
+        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_4__["default"], { classes: { root: 'customClass' }, "aria-labelledby": "form-dialog-title" },
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_5__["default"], { id: "form-dialog-title", className: classes.dlgTitle }, title),
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_material_ui_core__WEBPACK_IMPORTED_MODULE_6__["default"], { className: classes.dlgContent },
                 react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Assignment__WEBPACK_IMPORTED_MODULE_2__["default"], { getPConnect: createdView.getPConnect, itemKey: itemKey }, arNewChildrenAsReact)))
         :
             react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null));
@@ -2943,9 +2939,9 @@ ModalViewContainer.defaultProps = {
     routingInfo: null
 };
 ModalViewContainer.propTypes = {
-    getPConnect: (prop_types__WEBPACK_IMPORTED_MODULE_8___default().func),
-    loadingInfo: (prop_types__WEBPACK_IMPORTED_MODULE_8___default().bool),
-    routingInfo: prop_types__WEBPACK_IMPORTED_MODULE_8___default().objectOf((prop_types__WEBPACK_IMPORTED_MODULE_8___default().any))
+    getPConnect: (prop_types__WEBPACK_IMPORTED_MODULE_7___default().func),
+    loadingInfo: (prop_types__WEBPACK_IMPORTED_MODULE_7___default().bool),
+    routingInfo: prop_types__WEBPACK_IMPORTED_MODULE_7___default().objectOf((prop_types__WEBPACK_IMPORTED_MODULE_7___default().any))
 };
 
 

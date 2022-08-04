@@ -395,10 +395,10 @@ function startCase(caseTypeId, content) {
             caseInfo: { content: content }
             //   , pageName: 'pyEmbedAssignment' 
         });
-        yield window.PCore.getMashupApi().createCase(caseTypeId, 'root', {
-            pageName: 'pyEmbedAssignment',
-            startingFields: content
-        });
+        // await window.PCore.getMashupApi().createCase(caseTypeId, 'root', {
+        //   pageName: 'pyEmbedAssignment',
+        //   startingFields: content
+        // });
     });
 }
 function continueCase(assignmentId, className) {
@@ -418,8 +418,8 @@ function lazyLoad(type, element) {
             window.PCore.onPCoreReady((renderObj) => __awaiter(this, void 0, void 0, function* () {
                 window.PCore.getDebugger().toggleXRay(true);
                 const React = (yield __webpack_require__.e(/*! import() */ "vendors-node_modules_react_index_js").then(__webpack_require__.t.bind(__webpack_require__, /*! react */ "./node_modules/react/index.js", 19))).default;
-                const initialRender = (yield Promise.all(/*! import() */[__webpack_require__.e("vendors-node_modules_react_index_js"), __webpack_require__.e("vendors-node_modules_date-io_dayjs_build_index_esm_js-node_modules_fortawesome_free-regular-s-784131"), __webpack_require__.e("src_bridge_react_pconnect_jsx"), __webpack_require__.e("src_initial_render_tsx")]).then(__webpack_require__.bind(__webpack_require__, /*! ./initial_render */ "./src/initial_render.tsx"))).default;
-                const createPConnectComponent = (yield Promise.all(/*! import() */[__webpack_require__.e("vendors-node_modules_react_index_js"), __webpack_require__.e("vendors-node_modules_date-io_dayjs_build_index_esm_js-node_modules_fortawesome_free-regular-s-784131"), __webpack_require__.e("src_bridge_react_pconnect_jsx")]).then(__webpack_require__.bind(__webpack_require__, /*! ./bridge/react_pconnect */ "./src/bridge/react_pconnect.jsx"))).default;
+                const initialRender = (yield Promise.all(/*! import() */[__webpack_require__.e("vendors-node_modules_react_index_js"), __webpack_require__.e("vendors-node_modules_date-io_dayjs_build_index_esm_js-node_modules_fortawesome_free-regular-s-23b87a"), __webpack_require__.e("src_bridge_react_pconnect_jsx"), __webpack_require__.e("src_initial_render_tsx")]).then(__webpack_require__.bind(__webpack_require__, /*! ./initial_render */ "./src/initial_render.tsx"))).default;
+                const createPConnectComponent = (yield Promise.all(/*! import() */[__webpack_require__.e("vendors-node_modules_react_index_js"), __webpack_require__.e("vendors-node_modules_date-io_dayjs_build_index_esm_js-node_modules_fortawesome_free-regular-s-23b87a"), __webpack_require__.e("src_bridge_react_pconnect_jsx")]).then(__webpack_require__.bind(__webpack_require__, /*! ./bridge/react_pconnect */ "./src/bridge/react_pconnect.jsx"))).default;
                 window.PCore.registerComponentCreator((c11nEnv, additionalProps = {}) => {
                     const PConnectComp = createPConnectComponent();
                     return (React.createElement(PConnectComp, Object.assign({}, Object.assign(Object.assign(Object.assign(Object.assign({}, c11nEnv), c11nEnv.getPConnect().getConfigProps()), c11nEnv.getPConnect().getActions()), { additionalProps }))));
