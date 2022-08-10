@@ -1,20 +1,4 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Pega - React SDK - Sample application</title>
-  <script src="app.bundle.js"></script></head>
-  <body>
-    <noscript>
-      <strong>The React SDK example does not work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
-
-    <div id="outlet"></div>
-    <script>
-      (async () => {
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pega - React SDK - Sample application</title><script src="app.bundle.js"></script></head><body><noscript><strong>The React SDK example does not work properly without JavaScript enabled. Please enable it to continue.</strong></noscript><div id="outlet"></div><script>(async () => {
         const searchParams = new URL(window.location.href).searchParams;
         const assignmentID = searchParams.get('assignmentID');
         const className = searchParams.get('className');
@@ -25,7 +9,7 @@
             tokenUri: "http://localhost:8081/serviceplus/_config/dev/api/token"
           },
           serverConfig: {
-            infinityRestServerUrl: "https://apiservices.dev.sscl.com:8065",
+            infinityRestServerUrl: "http://localhost:8081",
             // infinityRestServerUrl: "https://labbconsulting02.pegalabs.io/prweb",
             // infinityRestServerUrl: "http://localhost:9905/prweb",
             sdkContentServerUrl: "http://localhost:3502/constellation/"
@@ -39,7 +23,4 @@
           await window.pega.startCase('SSCL-Leaver-Work-Resignation', {});
           // await window.pega.startCase('LABB-DX-Work-Resignation', {});
         }
-      })();
-    </script>
-  </body>
-</html>
+      })();</script></body></html>
