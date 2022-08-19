@@ -1,7 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pega - React SDK - Sample application</title><script src="app.bundle.js"></script></head><body><noscript><strong>The React SDK example does not work properly without JavaScript enabled. Please enable it to continue.</strong></noscript><div id="outlet"></div><script>(async () => {
         const searchParams = new URL(window.location.href).searchParams;
         const assignmentID = searchParams.get('assignmentID');
-        const className = searchParams.get('className');
  
         await window.pega.initPega({
           authConfig: {
@@ -9,18 +8,20 @@
             tokenUri: "http://localhost:8081/serviceplus/_config/dev/api/token"
           },
           serverConfig: {
-            infinityRestServerUrl: "http://localhost:8081",
+            // infinityRestServerUrl: "http://localhost:8081",
+            infinityRestServerUrl: "http://localhost:9901/prweb",
             // infinityRestServerUrl: "https://labbconsulting02.pegalabs.io/prweb",
             // infinityRestServerUrl: "http://localhost:9905/prweb",
             sdkContentServerUrl: "http://localhost:3502/constellation/"
+            // sdkContentServerUrl: "https://c11n-prod.constellation.cloud.pega.net/c11n/"
           }
         });
         await window.pega.initMashup(document.getElementById('outlet'));
         // await window.pega.startCase('LABB-DX-Work-Resignation', {});
-        if (assignmentID && className) {
-          await window.pega.continueCase(assignmentID, className);
+        if (assignmentID) {
+          await window.pega.continueCase(assignmentID);
         } else {
-          await window.pega.startCase('SSCL-Leaver-Work-Resignation', {});
+          await window.pega.startCase('SSCL-JML-Work-Leaver', {});
           // await window.pega.startCase('LABB-DX-Work-Resignation', {});
         }
       })();</script></body></html>
