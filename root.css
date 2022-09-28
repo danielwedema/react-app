@@ -9,7 +9,7 @@
     font-variant: var(--font-variant-default);
     font-weight: 200;
     font-weight: var(--font-weight-ultralight);
-    src: local("Gilroy UltraLight"), url(../fonts/Gilroy-UltraLight.otf) format("opentype");
+    src: local("Gilroy UltraLight"), url(../../assets/fonts/Gilroy-UltraLight.otf) format("opentype");
     unicode-range: "U+0020-007D,  U+007F-00FF,  U+0131,  U+0152-0153,  U+02C6,  U+02DA,  U+02DC,  U+2000-206F,  U+2074,  U+20AC,  U+2212,  U+2215,  U+E0FF,  U+EFFD,  U+F000";
     unicode-range: var(--unicode-range-default);
   }
@@ -24,7 +24,7 @@
     font-variant: var(--font-variant-default);
     font-weight: 300;
     font-weight: var(--font-weight-light);
-    src: local("Gilroy Light"), url(../fonts/Gilroy-Light.otf) format("opentype");
+    src: local("Gilroy Light"), url(../../assets/fonts/Gilroy-Light.otf) format("opentype");
     unicode-range: "U+0020-007D,  U+007F-00FF,  U+0131,  U+0152-0153,  U+02C6,  U+02DA,  U+02DC,  U+2000-206F,  U+2074,  U+20AC,  U+2212,  U+2215,  U+E0FF,  U+EFFD,  U+F000";
     unicode-range: var(--unicode-range-default);
   }
@@ -39,7 +39,7 @@
     font-variant: var(--font-variant-default);
     font-weight: 400;
     font-weight: var(--font-weight-default);
-    src: local("Gilroy Regular"), url(../fonts/Gilroy-Regular.otf) format("opentype");
+    src: local("Gilroy Regular"), url(../../assets/fonts/Gilroy-Regular.otf) format("opentype");
     unicode-range: "U+0020-007D,  U+007F-00FF,  U+0131,  U+0152-0153,  U+02C6,  U+02DA,  U+02DC,  U+2000-206F,  U+2074,  U+20AC,  U+2212,  U+2215,  U+E0FF,  U+EFFD,  U+F000";
     unicode-range: var(--unicode-range-default);
   }
@@ -54,7 +54,7 @@
     font-variant: var(--font-variant-default);
     font-weight: 500;
     font-weight: var(--font-weight-medium);
-    src: local("Gilroy Medium"), url(../fonts/Gilroy-Medium.otf) format("opentype");
+    src: local("Gilroy Medium"), url(../../assets/fonts/Gilroy-Medium.otf) format("opentype");
     unicode-range: "U+0020-007D,  U+007F-00FF,  U+0131,  U+0152-0153,  U+02C6,  U+02DA,  U+02DC,  U+2000-206F,  U+2074,  U+20AC,  U+2212,  U+2215,  U+E0FF,  U+EFFD,  U+F000";
     unicode-range: var(--unicode-range-default);
   }
@@ -69,7 +69,7 @@
     font-variant: var(--font-variant-default);
     font-weight: 600;
     font-weight: var(--font-weight-semibold);
-    src: local("Gilroy SemiBold"), url(../fonts/Gilroy-SemiBold.otf) format("opentype");
+    src: local("Gilroy SemiBold"), url(../../assets/fonts/Gilroy-SemiBold.otf) format("opentype");
     unicode-range: "U+0020-007D,  U+007F-00FF,  U+0131,  U+0152-0153,  U+02C6,  U+02DA,  U+02DC,  U+2000-206F,  U+2074,  U+20AC,  U+2212,  U+2215,  U+E0FF,  U+EFFD,  U+F000";
     unicode-range: var(--unicode-range-default);
   }
@@ -84,7 +84,7 @@
     font-variant: var(--font-variant-default);
     font-weight: 700;
     font-weight: var(--font-weight-bold);
-    src: local("Gilroy Bold"), url(../fonts/Gilroy-Bold.otf) format("opentype");
+    src: local("Gilroy Bold"), url(../../assets/fonts/Gilroy-Bold.otf) format("opentype");
     unicode-range: "U+0020-007D,  U+007F-00FF,  U+0131,  U+0152-0153,  U+02C6,  U+02DA,  U+02DC,  U+2000-206F,  U+2074,  U+20AC,  U+2212,  U+2215,  U+E0FF,  U+EFFD,  U+F000";
     unicode-range: var(--unicode-range-default);
   }
@@ -99,7 +99,7 @@
     font-variant: var(--font-variant-default);
     font-weight: 800;
     font-weight: var(--font-weight-extrabold);
-    src: local("Gilroy ExtraBold"), url(../fonts/Gilroy-ExtraBold.otf) format("opentype");
+    src: local("Gilroy ExtraBold"), url(../../assets/fonts/Gilroy-ExtraBold.otf) format("opentype");
     unicode-range: "U+0020-007D,  U+007F-00FF,  U+0131,  U+0152-0153,  U+02C6,  U+02DA,  U+02DC,  U+2000-206F,  U+2074,  U+20AC,  U+2212,  U+2215,  U+E0FF,  U+EFFD,  U+F000";
     unicode-range: var(--unicode-range-default);
   }
@@ -114,7 +114,7 @@
     font-variant: var(--font-variant-default);
     font-weight: 900;
     font-weight: var(--font-weight-heavy);
-    src: local("Gilroy Heavy"), url(../fonts/Gilroy-Heavy.otf) format("opentype");
+    src: local("Gilroy Heavy"), url(../../assets/fonts/Gilroy-Heavy.otf) format("opentype");
     unicode-range: "U+0020-007D,  U+007F-00FF,  U+0131,  U+0152-0153,  U+02C6,  U+02DA,  U+02DC,  U+2000-206F,  U+2074,  U+20AC,  U+2212,  U+2215,  U+E0FF,  U+EFFD,  U+F000";
     unicode-range: var(--unicode-range-default);
   }
