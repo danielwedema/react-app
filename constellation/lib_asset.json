@@ -1,5 +1,7 @@
 {
-  "externals":[],
-  "entry":[],
-  "prerequisite":["constellation-core.76f4047b.js"]
+  "isSdk": true,
+  "isDevServerMode": false,
+  "externals": [],
+  "entry": [],
+  "prerequisite": [{ "constellation-core.8cd357b3.js": "" }]
 }
