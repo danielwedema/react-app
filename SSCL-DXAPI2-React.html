@@ -1,0 +1,371 @@
+﻿<h1 id="sscl-dx-api-2-using-pegas-react-sdk">SSCL DX API 2 Using Pega’s React SDK<sup class="footnote-ref"><a href="#fn1" id="fnref1">1</a></sup></h1>
+<h2 id="introduction-to-dx-api">Introduction to DX API</h2>
+<p>The Pega business process management platform comes with a set of REST API’s for case management. The platform comes with out of the box UI’s for a full client portal experience.</p>
+<p>For customers who want to embed Pega screens in an existing design system there used to be 2 solutions before version 8.1 of the Pega Platform.</p>
+<ol>
+<li>Build their own hardcoded frontend UI’s and call the data API’s to manipulate cases</li>
+<li>Use a server side rendered UI, which will manage the calling of API’s itself</li>
+</ol>
+<p><img src="https://docs.pega.com/sites/default/files/drupal/dita/out/3646/platform-helpsystem/Resources/Images/UI/Mashup-skeleton-view-const.png" alt="embedded"></p>
+<p>When building a hardcoded UI the customer will miss a big part of the full power of the Pega platform. Any change in the case requirements will necessitate the same change in the frontend application. Keeping these changes in the frontend and the backend in sync can become challenging over time. The alternative was to copy the design system into the Pega platform and have the server generate the html. This html can then be embedded into the existing design system using iframe technology. With this solution it is not the case requirements that need to be kept in sync, but instead the design system updates.</p>
+<p>Each of these solutions have the requirement of keeping frontend and backend in sync. For this reason a new set of API’s was introduced in version 8.1: the Digital Experience API (DX API). These API’s do not only return the data associated with cases, but also expose the UI definitions in the JSON response. For embedded Pega screens the existing website can now retrieve the UI definitions in runtime and generate the design in their own design system. Hardcoded UI’s or server side rendered HTML is not needed anymore, and there is no more tight coupling between frontend and backend.</p>
+<p>However, with DX API 1.0, Pega did not offer any out of the box tools for the frontend developer. A customer has to build their own rendering engine that connects to the DX API. With the introduction of DX API 2.0 in version 8.7, Pega has not only simplified the DX API’s but also introduced a <a href="https://docs.pega.com/using-pcore-and-pconnect-public-apis/87/using-pcore-and-pconnect-public-apis">new frontend stack</a> to help out the frontend developers.</p>
+<p><img src="https://docs.pega.com/sites/default/files/media/images/2022-04/Constellation%20Architecture%20updated_2.png" alt="architecture"></p>
+<p>A big improvement is the addition of the <a href="https://www.npmjs.com/package/@pega/constellationjs">Constellation JavaScript library</a>. This library hides a lot of the Pega specific knowledge behind a Javascript API. This includes the interactions with the REST API’s and state management. This library is independent of any frontend framework, and can thus be used in combination with any of the modern frameworks (React, Angular, VueJs, etc).</p>
+<p>The out of the box customer portal is built with React using this library and the <a href="https://design.pega.com/">Cosmos design system</a>. For customers with a custom design system wanting to embed the Pega screens in their own website, a few SDK repositories are available to help jumpstart the process:</p>
+<ul>
+<li><a href="https://github.com/pegasystems/react-sdk/">Pega React SDK</a></li>
+<li><a href="https://github.com/pegasystems/angular-sdk/">Pega Angular SDK</a></li>
+<li><a href="https://github.com/pegasystems/webcomponent-sdk/">Pega Webcomponent SDK</a></li>
+</ul>
+<p>These SDK’s are an implementation of a specific frontend framework and all use <a href="https://material.io/design">Material Design</a> as the design system. The React application for MyHub is a fork of the out of the box <strong>Pega React SDK</strong>, which is built on the <a href="https://mui.com/">React implementation of Material Design</a>. The modifications made to fit it to the MyHub environment are described in this document.</p>
+<p>The SDK contains components for rendering a <a href="https://docs.pega.com/bundle/platform-88/page/platform/user-experience/working-with-portals-con.html">full portal</a>. However, the full portal functionality is out of scope for MyHub. Instead the focus is on <a href="https://docs.pega.com/bundle/platform-88/page/platform/user-experience/web-embedding-constellation.html">embedded views</a>, where MyHub will function as the user portal. In this solution the public Pega UI Service and Cosmos React are not used, instead the static content is packaged and deployed to MyHub, where the MyHub servers act as the customer UI service.</p>
+<h2 id="usage">Usage</h2>
+<p>The MyHub React application is delivered as a javascript bundle, which can be included as</p>
+<pre class=" language-html"><code class="prism  language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>app.bundle.js<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token script language-javascript"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span>
+</code></pre>
+<p>The bundle exposes a Pega interface on <code>window.pega</code> with the following functionality</p>
+<pre class=" language-typescript"><code class="prism  language-typescript"><span class="token keyword">interface</span> <span class="token class-name">PegaInterface</span> <span class="token punctuation">{</span>
+  <span class="token comment">// initialises a connection with pega, urls to external systems are in the config object</span>
+  <span class="token function">initPega</span><span class="token punctuation">(</span>config<span class="token punctuation">:</span> Config<span class="token punctuation">)</span><span class="token punctuation">:</span> Promise<span class="token operator">&lt;</span><span class="token keyword">void</span><span class="token operator">&gt;</span><span class="token punctuation">;</span>
+  
+  <span class="token comment">//  loads the react framework and bind the result from the DX API to a DOM element</span>
+  <span class="token function">initMashup</span><span class="token punctuation">(</span>el<span class="token punctuation">:</span> Element<span class="token punctuation">)</span><span class="token punctuation">:</span> Promise<span class="token operator">&lt;</span><span class="token keyword">void</span><span class="token operator">&gt;</span><span class="token punctuation">;</span>
+  
+  <span class="token comment">// retrieves the number of items on a datapage, can be used to show a notification badge</span>
+  <span class="token function">getNotificationCount</span><span class="token punctuation">(</span>dataPageId<span class="token operator">?</span><span class="token punctuation">:</span> <span class="token keyword">string</span> <span class="token operator">=</span> <span class="token string">'D_pyMyWorkList'</span><span class="token punctuation">)</span><span class="token punctuation">:</span> Promise<span class="token operator">&lt;</span><span class="token keyword">number</span><span class="token operator">&gt;</span>
+  
+  <span class="token comment">// renders an information page that is modeled in Pega</span>
+  <span class="token function">showPage</span><span class="token punctuation">(</span>page<span class="token punctuation">:</span> <span class="token keyword">string</span><span class="token punctuation">,</span> className<span class="token punctuation">:</span> <span class="token keyword">string</span><span class="token punctuation">)</span><span class="token punctuation">:</span> Promise<span class="token operator">&lt;</span><span class="token keyword">void</span><span class="token operator">&gt;</span><span class="token punctuation">;</span>
+  
+  <span class="token comment">// renders a web form and create a case</span>
+  <span class="token function">startCase</span><span class="token punctuation">(</span>caseTypeId<span class="token punctuation">:</span> <span class="token keyword">string</span><span class="token punctuation">,</span> content<span class="token punctuation">:</span> Object<span class="token punctuation">)</span><span class="token punctuation">:</span> Promise<span class="token operator">&lt;</span><span class="token keyword">void</span><span class="token operator">&gt;</span><span class="token punctuation">;</span>
+  
+  <span class="token comment">// renders the current assignment of an existing case</span>
+  <span class="token function">continueCase</span><span class="token punctuation">(</span>assignmentId<span class="token punctuation">:</span> <span class="token keyword">string</span><span class="token punctuation">)</span><span class="token punctuation">:</span>d Promise<span class="token operator">&lt;</span><span class="token keyword">void</span><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>where the configuration for initialisation is as follows</p>
+<pre class=" language-typescript"><code class="prism  language-typescript"><span class="token keyword">interface</span> <span class="token class-name">Config</span> <span class="token punctuation">{</span>
+  authConfig<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    gatewayTokenUrl<span class="token punctuation">:</span>  <span class="token keyword">string</span><span class="token punctuation">;</span>
+    gatewayTokenRefreshUrl<span class="token punctuation">:</span>  <span class="token keyword">string</span><span class="token punctuation">;</span>
+    pegaTokenUrl<span class="token punctuation">:</span>  <span class="token keyword">string</span><span class="token punctuation">;</span>
+    pegaHeaderName<span class="token punctuation">:</span>  <span class="token keyword">string</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  serverConfig<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    infinityRestServerUrl<span class="token punctuation">:</span> <span class="token keyword">string</span><span class="token punctuation">;</span>
+    sdkContentServerUrl<span class="token punctuation">:</span> <span class="token keyword">string</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>A connection with Pega can be setup using the <code>initPega</code> function. This will perform the following steps:</p>
+<ol>
+<li>Retrieve a JWT to access the gateway</li>
+<li>Retrieve an encrypted JWT (JWE) to access Pega</li>
+<li>Initialise Pega’s Constellation Core using the Bootstrap Shell</li>
+</ol>
+<p>Since there are 2 tokens involved (one to access the gateway and another to access Pega), there are 2 request headers involved for sending these tokens from the React application. The gateway access token is passed to the <a href="https://docs.pega.com/bundle/pcore-pconnect-88/page/pcore-pconnect-public-apis/api/settokens-tokeninfo.html">setTokens</a> method of the constellation core, which in turn will add the access token as a basic <code>authorization</code> header on all API requests. The JWE is passed to the <a href="https://docs.pega.com/bundle/pcore-pconnect-88/page/pcore-pconnect-public-apis/api/registerheader-key-value.html">registerHeader</a> method of the constellation core, where the value is set to a custom request header as specified by <code>pegaHeaderName</code>.</p>
+<p>Once the connection is setup, the Pega server can be queried for information, e.g. using the <code>getNotificationCount</code> function (calls <a href="https://docs.pega.com/using-pcore-and-pconnect-public-apis/87/getlistcountdataviewname-payload-context">getListCount</a>).</p>
+<p>Before rendering a mashup, the <code>initMashup</code> function needs to be called. This function will bind the result from the DX API to a Document Object Model (DOM) node in the browser. Once the DX API is bound to the DOM, the <a href="https://docs.pega.com/bundle/pcore-pconnect-88/page/pcore-pconnect-public-apis/api/apis-mashupapi-class.html">MashupAPI</a> is exposed under the following functions:</p>
+<ul>
+<li><code>showPage</code> to render a page (calls <a href="https://docs.pega.com/bundle/pcore-pconnect-88/page/pcore-pconnect-public-apis/api/openpage-pagename-classname-targetcontext.html">openPage</a>)</li>
+<li><code>startCase</code> to render the screens for case creation (calls <a href="https://docs.pega.com/bundle/pcore-pconnect-88/page/pcore-pconnect-public-apis/api/opencase-caseid-targetcontext-options.html">openCase</a>)</li>
+<li><code>continueCase</code> to render the screens for an existing case (calls <a href="https://docs.pega.com/bundle/pcore-pconnect-88/page/pcore-pconnect-public-apis/api/openassignment-assignmentid-targetcontext-options.html">openAssignment</a>)</li>
+</ul>
+<h2 id="example">Example</h2>
+<p>In this example a connection with Pega is setup, the constellation core is bound to the outlet DOM node and a case creation is started for a process with id <code>CaseTypeId</code></p>
+<pre class=" language-html"><code class="prism  language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>outlet<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">&gt;</span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>app.bundle.js<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token script language-javascript"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">&gt;</span></span><span class="token script language-javascript">
+  <span class="token punctuation">(</span><span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token keyword">await</span> window<span class="token punctuation">.</span>pega<span class="token punctuation">.</span><span class="token function">initPega</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+      authConfig<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        gatewayTokenUrl<span class="token punctuation">:</span>  <span class="token string">'/location/to/gateway/token'</span><span class="token punctuation">,</span>
+        gatewayTokenRefreshUrl<span class="token punctuation">:</span>  <span class="token template-string"><span class="token string">`/location/to/gateway/token-refresh`</span></span><span class="token punctuation">,</span>
+        pegaTokenUrl<span class="token punctuation">:</span>  <span class="token string">'/location/to/pega/token'</span><span class="token punctuation">,</span>
+        pegaHeaderName<span class="token punctuation">:</span>  <span class="token string">'CustomPegaHeader'</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      serverConfig<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        infinityRestServerUrl<span class="token punctuation">:</span> <span class="token string">"/location/to/pega"</span><span class="token punctuation">,</span>
+        sdkContentServerUrl<span class="token punctuation">:</span> <span class="token string">"/location/to/sdk"</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">await</span> window<span class="token punctuation">.</span>pega<span class="token punctuation">.</span><span class="token function">initMashup</span><span class="token punctuation">(</span>document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'outlet'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">await</span> window<span class="token punctuation">.</span>pega<span class="token punctuation">.</span><span class="token function">startCase</span><span class="token punctuation">(</span><span class="token string">'CaseTypeId'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span>
+</code></pre>
+<h2 id="modifications">Modifications</h2>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> The bootstrap-shell file is versioned in the public NPM registry through the <a href="https://www.npmjs.com/package/@pega/constellationjs">@pega/constellationjs</a> package. However, because the Pega provided code is forked and modified as described below it is not possible anymore to version these dependencies through NPM. Whenever a new version of the constellation-core is introduced, the below modifications need to be re-applied until Pega supports this out of the box. This is issue is under investigation with Pega and we will undo the modifications when it is supported out of the box.</p>
+</blockquote>
+<p>By default the React SDK is using an Oauth 2.0 flow for authentication.</p>
+<p>To support custom authentication an extra package has been created for the Pega server. This package is registered under the name <code>applicationCustom</code>, which means that the endpoint pattern becomes <code>/api/applicationCustom/&lt;version&gt;/&lt;path&gt;</code>.</p>
+<p>This renamed package causes 2 issues:</p>
+<ol>
+<li>in the <code>bootstrap-shell.js</code> file the url <code>/api/application/v2/data_views/D_pxBootstrapConfig</code> is hardcoded</li>
+<li>the response from the above call returns configuration which always returns endpoints starting with <code>/api/application/v2</code> independent of the package name.</li>
+<li>the endpoint only supports authorization headers, but not custom request headers</li>
+</ol>
+<p>The only solution here is to modify the distributed bootstrap-shell file and add support for custom request headers, replace the hardcoded url and modify the response of the bootstrap configuration.</p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token comment">// bootstrap-shell.js: original version</span>
+<span class="token keyword">let</span>  g<span class="token punctuation">,</span> <span class="token punctuation">{</span>authorizationHeader<span class="token punctuation">:</span> h<span class="token punctuation">,</span> appAlias<span class="token punctuation">:</span> u<span class="token punctuation">}</span> <span class="token operator">=</span>  e<span class="token punctuation">;</span>
+
+g  <span class="token operator">=</span>  <span class="token keyword">await</span>  <span class="token function">getBootstrapConfig</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>a<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>u<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">`</span></span><span class="token punctuation">,</span> h<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">:</span> g  <span class="token operator">=</span>  <span class="token keyword">await</span>  <span class="token function">getBootstrapConfig</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>a<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">`</span></span><span class="token punctuation">,</span> h<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+getBootstrapConfig <span class="token operator">=</span> <span class="token keyword">async</span><span class="token punctuation">(</span>e<span class="token punctuation">,</span>o<span class="token punctuation">)</span> <span class="token operator">=&gt;</span>
+  <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>e<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/api/application/v2/data_views/D_pxBootstrapConfig`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+    method<span class="token punctuation">:</span> <span class="token string">"GET"</span><span class="token punctuation">,</span>
+    headers<span class="token punctuation">:</span> <span class="token keyword">new</span> <span class="token class-name">Headers</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    Authorization<span class="token punctuation">:</span> o
+  <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span>e<span class="token operator">=&gt;</span>e<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token comment">//  bootstrap-shell.js: forked version</span>
+<span class="token keyword">let</span> g<span class="token punctuation">,</span> <span class="token punctuation">{</span>authorizationHeader<span class="token punctuation">:</span> h<span class="token punctuation">,</span> appAlias<span class="token punctuation">:</span> u<span class="token punctuation">,</span> customHeaders<span class="token punctuation">:</span> ch<span class="token punctuation">}</span> <span class="token operator">=</span> e<span class="token punctuation">;</span>
+  
+g <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">getBootstrapConfig</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>a<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>u<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">`</span></span><span class="token punctuation">,</span> h<span class="token punctuation">,</span> ch<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">:</span> g <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">getBootstrapConfig</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>a<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">`</span></span><span class="token punctuation">,</span> h<span class="token punctuation">,</span> ch<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+getBootstrapConfig <span class="token operator">=</span> <span class="token keyword">async</span><span class="token punctuation">(</span>e<span class="token punctuation">,</span>o<span class="token punctuation">,</span>ch<span class="token punctuation">)</span> <span class="token operator">=&gt;</span>
+  <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>e<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/api/applicationCustom/v2/data_views/D_pxBootstrapConfig`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+    method<span class="token punctuation">:</span> <span class="token string">"GET"</span><span class="token punctuation">,</span>
+    headers<span class="token punctuation">:</span> <span class="token keyword">new</span> <span class="token class-name">Headers</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    Authorization<span class="token punctuation">:</span> o<span class="token punctuation">,</span>
+    <span class="token operator">...</span>ch
+  <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span>e<span class="token operator">=&gt;</span><span class="token punctuation">{</span><span class="token keyword">if</span><span class="token punctuation">(</span>e<span class="token punctuation">.</span>ok<span class="token punctuation">)</span><span class="token keyword">return</span> e<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">Error</span><span class="token punctuation">(</span><span class="token string">''</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span>r<span class="token operator">=&gt;</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+   <span class="token operator">...</span>r<span class="token punctuation">,</span>
+   pyConfigJSON<span class="token punctuation">:</span> r<span class="token punctuation">.</span>pyConfigJSON<span class="token punctuation">.</span><span class="token function">replaceAll</span><span class="token punctuation">(</span><span class="token string">'/application/'</span><span class="token punctuation">,</span> <span class="token string">'/applicationCustom/'</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<h2 id="authentication">Authentication</h2>
+<h3 id="access">Access</h3>
+<p>In the out of the box solution with Pega there is a direct connection between the client and the Pega server, where the Pega server acts as an identity provider. In the case of SSCL however, there are 2 major changes:</p>
+<ol>
+<li>Pega does not play the role of identity provider</li>
+<li>The connection between the client and Pega is going through a gateway</li>
+</ol>
+<p>The user starts a session by logging in to MyHub, where MyHub then exposes an endpoint to retrieve a JWT for accessing the gateway. This JWT is exchanged with MyHub for an encrypted access token that is then passed on to Pega with each request. Pega then verifies the authenticity of the access token and decodes the operator information from the token. Because the exchange for an access token requires a client secret, it has been decided to let MyHub expose an endpoint which will perform the exchange on behalf of the client.</p>
+<p><img src="https://raw.githubusercontent.com/labbltd/react-app/feature/docs/sequence.png" alt="token-exchange"></p>
+<h3 id="timeout">Timeout</h3>
+<p>Since there are multiple systems in place, there are multiple session timeouts that can appear.</p>
+<ul>
+<li>The MyHub session is renewed with every user interaction</li>
+<li>The gateway session is valid for the duration of the gateway token</li>
+<li>The Pega session is valid for the duration of the pega access token</li>
+</ul>
+<p>The React application retrieves a new access token on each page load. When the access token is expired, Pega will respond with a <code>401 Unauthenticated</code> status. Normally the expiration period will be much longer than the activity of the user on the page. I.e. before the Pega access token expires the user has already navigated, which would retrieve a new access token where the expiration date is reset.</p>
+<p>However, it is possible that the user is logged in to MyHub and loads a page with the React application, but then walks away from the computer. After a while both the MyHub session and the access token will have expired. MyHub will still show the page as before. Only upon navigation will it prompt a login screen. If the user does not navigate, but instead interacts with the React application, the Gateway will respond with <code>401</code>. In this case the React application will use the refresh token endpoint to refresh the tokens through MyHub. Since the MyHub session has expired as well, those refresh token calls themselves will fail. In that case the failure to renew tokens is detected and a message will be displayed:</p>
+<blockquote>
+<p>The session with the pega server has been lost. Please refresh the page or log in again.</p>
+</blockquote>
+<p>A last scenario is possible where the user stays on the page with the React application and keeps the MyHub session alive. When the interaction lasts longer than the token duration, then the user is still logged in to MyHub, but the Pega session is lost. In this scenario the refresh token will be used to retrieve new access tokens for both the gateway and for Pega. The constellation core will then use these new tokens and retry the last failed request.</p>
+<h2 id="design-system">Design System</h2>
+<p>The React SDK package from Pega comes out of the box with an integration with the <a href="https://mui.com/core/">React implementation</a> of Material Design. For SSCL a custom design system integration was desired. This design is owned by Squiz and <a href="https://www.figma.com/file/hU0LllVkoEDKtCKFGdVtO8/myHub-3.0">documented in Figma</a>.</p>
+<p>Since Squiz did not have an implementation of the form controls, a custom implementation has been created in the MyHub React SDK. These controls are as much as possible independent of Pega logic and are purely presentational components.</p>
+<p>The components are maintained in the folder <code>src/designSystem</code> and include the following elements:</p>
+<ul>
+<li>Button</li>
+<li>Snackbar (status notification at the bottom of a screen)</li>
+<li>FormControls:
+<ul>
+<li>Checkbox</li>
+<li>Radio</li>
+<li>TextField (with support for Dropdown, Email, Date, TextArea, Number)</li>
+</ul>
+</li>
+</ul>
+<p>The original Pega elements still control the Pega logic, but instead of mapping to Material Design they now map to MyHub design components</p>
+
+<table>
+<thead>
+<tr>
+<th>Pega Control</th>
+<th>MyHub Control</th>
+<th>Configuration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Checkbox</td>
+<td>Checkbox</td>
+<td></td>
+</tr>
+<tr>
+<td>Date</td>
+<td>TextField</td>
+<td><code>type="date"</code></td>
+</tr>
+<tr>
+<td>Decimal</td>
+<td>TextField</td>
+<td><code>inputMode="decimal" pattern="[0-9]*"</code></td>
+</tr>
+<tr>
+<td>Dropdown</td>
+<td>Radio</td>
+<td>when less than 4 items</td>
+</tr>
+<tr>
+<td>Dropdown</td>
+<td>TextField</td>
+<td>when 4 or more items <code>select="true"</code></td>
+</tr>
+<tr>
+<td>Email</td>
+<td>TextField</td>
+<td><code>type="email"</code></td>
+</tr>
+<tr>
+<td>Integer</td>
+<td>TextField</td>
+<td><code>inputMode="numeric" pattern="[0-9]*"</code></td>
+</tr>
+<tr>
+<td>Radio</td>
+<td>RadioButtons</td>
+<td></td>
+</tr>
+<tr>
+<td>TextArea</td>
+<td>TextField</td>
+<td><code>multiline="true"</code></td>
+</tr>
+<tr>
+<td>TextInput</td>
+<td>TextField</td>
+<td></td>
+</tr>
+</tbody>
+</table><p>A separate application is created to showcase these MyHub design elements. The resulting interactive MyHub <a href="https://danielwedema.github.io/react-app/designSystem.html">design system showcase</a> is available. Each form control is displayed with the following states: with helper text, required, disabled and with error.</p>
+<h3 id="material-design">Material design</h3>
+<p>Some components from React Material Design have been kept in the application and are not mapped to MyHub specific elements. This relates mainly to Material Design components meant for layout purposes, such as</p>
+<ul>
+<li><a href="https://mui.com/material-ui/react-grid/">Grid</a></li>
+<li><a href="https://mui.com/material-ui/react-card/">Card</a></li>
+<li><a href="https://mui.com/material-ui/react-table/">Table</a></li>
+</ul>
+<h3 id="icons">Icons</h3>
+<p>Where possible, the icons from <a href="https://fontawesome.com/">Font Awesome</a> have been used in the MyHub SDK, instead of icons from React Material or the SVG files included in the original React SDK.</p>
+<h2 id="development">Development</h2>
+<h3 id="proxy-to-live-environment">Proxy to live environment</h3>
+<p>The application is developed against MyHub and the API Gateway environments.</p>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> The resulting react application has no references to these environments, instead all configuration is passed in using <code>window.pega.initPega(config)</code>. Also see the <a href="#usage">Usage</a> section.</p>
+</blockquote>
+<p>In the test environment of MyHub a configuration is used where MyHub provides the JWT and exchanges it with the gateway for the access token.</p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token punctuation">{</span>
+  authConfig<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    gatewayTokenUrl<span class="token punctuation">:</span> <span class="token string">"https://myhub.sscl.com/location/to/gateway/token"</span><span class="token punctuation">,</span>
+    gatewayTokenRefreshUrl<span class="token punctuation">:</span> <span class="token string">"https://myhub.sscl.com/location/to/gateway/token-refresh"</span><span class="token punctuation">,</span>
+    pegaTokenUrl<span class="token punctuation">:</span> <span class="token string">"https://myhub.sscl.com/location/to/pega/token"</span><span class="token punctuation">,</span>
+    pegaHeaderName<span class="token punctuation">:</span> <span class="token string">"CustomPegaHeader"</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  serverConfig<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    infinityRestServerUrl<span class="token punctuation">:</span> <span class="token string">"https://apiservices.sscl.com"</span><span class="token punctuation">,</span>
+    sdkContentServerUrl<span class="token punctuation">:</span> <span class="token string">"https://myhub.sscl.com/constellation/"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>Not all these endpoints allow CORS requests coming from localhost. Therefore a simple node.js proxy is added to the repo which forwards all Pega API calls to the API gateway and the rest to MyHub. The proxy can be started by running <code>node scripts/proxy.js</code>. The proxy is now running on port <code>8081</code>.</p>
+<p>The proxy needs a session id to communicate with MyHub. After logging in to MyHub, copy the <code>SQ_SYSTEM_SESSION</code> cookie value. Go to <a href="http://localhost:8081">http://localhost:8081</a> and use the copied value as session id.</p>
+<p>Once the proxy is running, point all API traffic to it. Furthermore change the content url to point to the local constellation.</p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token punctuation">{</span>
+  authConfig<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    gatewayTokenUrl<span class="token punctuation">:</span> <span class="token string">"http://localhost:8081/location/to/gateway/token"</span><span class="token punctuation">,</span>
+    gatewayTokenRefreshUrl<span class="token punctuation">:</span> <span class="token string">"http://localhost:8081/location/to/gateway/token-refresh"</span><span class="token punctuation">,</span>
+    pegaTokenUrl<span class="token punctuation">:</span> <span class="token string">"http://localhost:8081/location/to/pega/token"</span><span class="token punctuation">,</span>
+    pegaHeaderName<span class="token punctuation">:</span> <span class="token string">"CustomPegaHeader"</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  serverConfig<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    infinityRestServerUrl<span class="token punctuation">:</span> <span class="token string">"http://localhost:8081"</span><span class="token punctuation">,</span>
+    sdkContentServerUrl<span class="token punctuation">:</span> <span class="token string">"http://localhost:3502/constellation/"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>After running <code>npm run start-dev</code> the application can be accessed at <a href="http://localhost:3502">http://localhost:3502</a>.</p>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> The calls to Pega go through an API gateway where IP whitelisting is applied. Make sure to run this application from a laptop whos IP is in the whitelist range.</p>
+</blockquote>
+<h3 id="api-mocking">API mocking</h3>
+<p>When a developer is running on a laptop that is not whitelisted, it is still possible to develop the React application using the provided API mocking server. For this feature to work it is necessary to have a HAR (HTTP archive) recording of a Pega scenario. After running <code>node scripts/mocking.js &lt;reference to HAR file&gt;</code> the recorded HTTP traffic will be replayed. Make sure to configure the index html file to point to the mocking server:</p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token punctuation">{</span>
+  authConfig<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    gatewayTokenUrl<span class="token punctuation">:</span> <span class="token string">"http://localhost:3000/location/to/gateway/token"</span><span class="token punctuation">,</span>
+    gatewayTokenRefreshUrl<span class="token punctuation">:</span> <span class="token string">"http://localhost:3000/location/to/gateway/token-refresh"</span><span class="token punctuation">,</span>
+    pegaTokenUrl<span class="token punctuation">:</span> <span class="token string">"http://localhost:3000/location/to/pega/token"</span><span class="token punctuation">,</span>
+    pegaHeaderName<span class="token punctuation">:</span> <span class="token string">"CustomPegaHeader"</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  serverConfig<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    infinityRestServerUrl<span class="token punctuation">:</span> <span class="token string">"http://localhost:3000"</span><span class="token punctuation">,</span>
+    sdkContentServerUrl<span class="token punctuation">:</span> <span class="token string">"http://localhost:3502/constellation/"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h3 id="stylebleeds">Stylebleeds</h3>
+<p>The React application provides its own styling which is aligned with MyHub styling. However, when the react application is embedded in a MyHub page, there are now 2 sources of styling applied to a single page. This can cause some conflict, where the React styling accidentally overrides MyHub styling or vice versa.</p>
+<p>To avoid React styling to override MyHub, all styling that comes with the React application is scoped to the main DOM node of the application.</p>
+<p>However, avoiding MyHub styling overriding React styling is more difficult. To best way to visually verify stylebleeds is to embed a local build of the react application in a live environment of MyHub using the following script:</p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token keyword">const</span> script <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">createElement</span><span class="token punctuation">(</span><span class="token string">'script'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+script<span class="token punctuation">.</span>type <span class="token operator">=</span> <span class="token string">'text/javascript'</span><span class="token punctuation">;</span>
+script<span class="token punctuation">.</span>src <span class="token operator">=</span> <span class="token string">'http://localhost:3502/app.bundle.js'</span><span class="token punctuation">;</span>
+document<span class="token punctuation">.</span><span class="token function">getElementsByTagName</span><span class="token punctuation">(</span><span class="token string">'body'</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">appendChild</span><span class="token punctuation">(</span>script<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<blockquote>
+<p><strong><em>NOTE</em></strong>: if the page already has an older version of the react app, then block the original <code>app.bundle.js</code> script in the network tab (right click the request and select Block request URL)</p>
+</blockquote>
+<p>Then the usual methods can be used to bootstrap an embedded Pega UI:</p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token punctuation">(</span><span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+  <span class="token keyword">await</span> window<span class="token punctuation">.</span>pega<span class="token punctuation">.</span><span class="token function">initPega</span><span class="token punctuation">(</span><span class="token operator">...</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// use the proxy config as described above</span>
+  <span class="token keyword">await</span> window<span class="token punctuation">.</span>pega<span class="token punctuation">.</span><span class="token function">initMashup</span><span class="token punctuation">(</span>
+    document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'outlet'</span><span class="token punctuation">)</span> <span class="token comment">// select a DOM node from MyHub</span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">await</span> window<span class="token punctuation">.</span>pega<span class="token punctuation">.</span><span class="token function">startCase</span><span class="token punctuation">(</span><span class="token string">'CaseTypeId'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>This will render the react application running on localhost in the MyHub portal running on a live environment.</p>
+<h2 id="performance">Performance</h2>
+<p>To boost performance, the functionality of the SDK is split in multiple bundles which are only loaded when required.</p>
+<p>The  <code>app.bundle.js</code> needed to connect to the Pega server is minimal in size and contains everything needed for non-UI related querying. The <code>initPega</code> call will load the following files:</p>
+<ul>
+<li><code>bootstrap-shell.js</code></li>
+<li><code>constellation-core.js</code></li>
+</ul>
+<p>Only when UI generation is involved, (i.e. the <code>initMashup</code> function is called) the entire React framework will be loaded through subsequent javascript bundles.</p>
+<h2 id="browser-support">Browser support</h2>
+<p>The SDK follows the <a href="https://docs.pega.com/pega-platform-client-operating-system-and-browser-support">browser support</a> that comes with the Pega platform. The SDK has been tested in the latest versions of Chrome, Firefox and Safari.</p>
+<h2 id="release-management">Release management</h2>
+<h3 id="versioning">Versioning</h3>
+<h3 id="distribution">Distribution</h3>
+<p>The SSCL React SDK code is available at <a href="https://github.com/danielwedema/sscl-dxapi">GitHub</a>. The repository visibility is set to private. Read access can be requested by SSCL affiliates.</p>
+<p>The application can be built by cloning the repo and running <code>npm run build:prod</code>. The distributable files are then available in the <code>dist</code> folder.</p>
+<p>For MyHub to pick up a new version, the contents of the <code>dist</code> folder is published to <a href="https://github.com/danielwedema/react-app">GitHub</a> as well. This repository is public such that the MyHub git integration can retrieve the files from it and update the website. Since these are compiled files, the risk of having this repository public is limited.</p>
+<h2 id="life-cycle-management">Life Cycle Management</h2>
+<p>The MyHub react application has a few dependencies (e.g. the react framework, the Pega SDK, etc). Over time these dependencies will push updates containing bug fixes, new features, etc. A process should be kept in place to keep these dependencies updated periodically. The dependencies for the React framework and the Constellation Core from Pega are relatively easy to keep up to date.</p>
+<p>However, the current setup of the out of the box Pega SDK software makes it hard to incorporate changes coming through the Pega SDK. Pega proposes the following way of work with the SDK’s:</p>
+<ol>
+<li>Fork a version of the SDK repository</li>
+<li>Modify the source code</li>
+<li>Pull changes from the source repository whenever a new version of the SDK repository is pushed</li>
+<li>Resolve merge conflicts</li>
+</ol>
+<p>Anywhere the MyHub SDK deviates from the Pega SDK this can cause merge conflicts in the future. At the moment the biggest risks of merge conflicts arise from the following adaptions in the fork:</p>
+<ul>
+<li>customisation of the authentication mechanism</li>
+<li>removal of the sample code</li>
+<li>mapping to custom MyHub controls</li>
+<li>bug fixes</li>
+</ul>
+<p>The more adaptations are made for MyHub, the higher the risk that the updates coming from Pega will interfere. Any change by Pega on code level is then a potential ‘breaking change’ causing a merge conflict and needs to be reviewed manually. Resolving these merge conflicts requires intimate knowledge of what changes were made by the developer in the MyHub react application and what changes were made by Pega in the Pega SDK. This is not a scalable solution and will demand increasing resources in the future.</p>
+<p>If instead the SDK was delivered as a library having a public API, then life cycle management would be much easier. In that case the dependency version can simply be updated and incoming code changes are abstracted behind the public API. Only when the public API is changed, then the update is considered a breaking changes which needs manual review. These breaking changes in the public API of a library are usually well documented in the changelog for a new version. The ConstellationJS library is an example of this way of working.</p>
+<p>Such a library is being developed in collaboration with Labb Consulting. In the future this library could be used for better maintenance and scalability.</p>
+<hr class="footnotes-sep">
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p>Created by <a href="mailto:daniel.wedema@labbconsulting.com">Daniel Wedema</a>,  September 2022 - <a href="https://labbconsulting.com/">Labb Consulting Ltd.</a> <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+</li>
+</ol>
+</section>
+
